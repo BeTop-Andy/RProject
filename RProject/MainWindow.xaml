@@ -1,0 +1,146 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="RProject.MainWindow"
+        Title="R-Project" Height="600" Width="800" MinWidth="800" MinHeight="600" Icon="Image/RIcon40_3.png" Closing="Window_Closing">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100*"/>
+            <ColumnDefinition Width="603*"/>
+            <ColumnDefinition Width="89*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="463*"/>
+            <RowDefinition Height="26*"/>
+        </Grid.RowDefinitions>
+        <ProgressBar x:Name="LoadingBar" IsIndeterminate="True" Visibility="Hidden" FlowDirection="LeftToRight" Grid.IsSharedSizeScope="True" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,10,0"/>
+        <TextBox x:Name="ResultTextBox" Margin="0,10,10,10" TextWrapping="Wrap" Text="等待选择文件" Grid.Column="1" VerticalContentAlignment="Center" IsEnabled="False"/>
+        <Button x:Name="ReadBtn" Content="打开" Margin="10,10,10,10" Grid.Column="3" Click="ReadBtn_Click" IsEnabled="False"/>
+        <StatusBar Grid.ColumnSpan="4" Grid.Row="3" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" FlowDirection="RightToLeft" />
+        <TabControl Grid.Row="2" TabStripPlacement="Left" Grid.ColumnSpan="4" Margin="10,10,10,0" HorizontalContentAlignment="Center">
+
+            <TabItem Header="首页" RenderTransformOrigin="0.5,0.5" Margin="0,-2,0,-9">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50*"/>
+                        <RowDefinition Height="397*"/>
+                    </Grid.RowDefinitions>
+                    <DataGrid x:Name="DataGrid1" Margin="10,0,10,10" IsReadOnly="True" Grid.Row="1"/>
+                    <Label Content="（数据库）请选择表" HorizontalAlignment="Left" Width="120" VerticalContentAlignment="Center" Margin="10,10,0,0" Height="30" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="ComboBox1" Text="请选择表:" SelectionChanged="ComboBox1_SelectionChanged" VerticalContentAlignment="Center" Margin="135,10,0,0" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" Width="119">
+                        <ComboBoxItem Content="cow"/>
+                        <ComboBoxItem Content="cow_device"/>
+                        <ComboBoxItem Content="data"/>
+                        <ComboBoxItem Content="temp"/>
+                    </ComboBox>
+                    <Label Content="（CSV）选择页数" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,10,294,0" FlowDirection="LeftToRight" HorizontalAlignment="Right" Width="116" Height="30" VerticalAlignment="Top"/>
+                    <Button x:Name="LastPageBtn" Content="上一页" Margin="0,10,228,0" Click="LastPageBtn_Click" FlowDirection="LeftToRight" Height="30" VerticalAlignment="Top" HorizontalAlignment="Right" Width="61" />
+                    <Label Content="现在第" VerticalContentAlignment="Center" Margin="0,10,175,0" Padding="0,5" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="48" Height="30" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="SelectPageCbB" Margin="0,10,104,0" SelectionChanged="SelectPageCbB_SelectionChanged" VerticalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Width="71" Height="30" VerticalAlignment="Top"/>
+                    <Label Content="页" VerticalContentAlignment="Center" Margin="0,10,76,0" Padding="0,5" RenderTransformOrigin="35.8,2.033" HorizontalAlignment="Right" Width="28" Height="30" VerticalAlignment="Top"/>
+                    <Button x:Name="NextPageBtn" Content="下一页" Margin="0,10,10,0" Click="NextPageBtn_Click" FlowDirection="LeftToRight" RenderTransformOrigin="10.3,1.633" HorizontalAlignment="Right" Width="61" Height="30" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="单头奶牛" Margin="0,9,0,-20" RenderTransformOrigin="0.5,0.5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="85*"/>
+                        <RowDefinition Height="64*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="统计&amp;画图" VerticalAlignment="Top" Height="255">
+                        <Grid Margin="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100*"/>
+                                <ColumnDefinition Width="100*"/>
+                                <ColumnDefinition Width="100*"/>
+                                <ColumnDefinition Width="100*"/>
+                                <ColumnDefinition Width="100*"/>
+                                <ColumnDefinition Width="100*"/>
+                                <ColumnDefinition Width="100*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Label Content="开始页数" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="60" Margin="10,10,0,0" Height="25" Visibility="Collapsed"/>
+                            <ComboBox x:Name="StartPageCbB1" Margin="70,10,14,0" ItemsSource="{Binding Items, ElementName=SelectPageCbB}" SelectionChanged="StartPageCbB1_SelectionChanged" VerticalContentAlignment="Center" Height="25" VerticalAlignment="Top" Visibility="Collapsed" Grid.ColumnSpan="3"/>
+                            <Label Content="结束页数" Margin="57,10,0,0" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="60" Visibility="Collapsed" Grid.Column="1" Grid.ColumnSpan="2"/>
+                            <ComboBox x:Name="EndPageCbB1" Margin="56,10,31,0" VerticalContentAlignment="Center" Height="25" VerticalAlignment="Top" SelectionChanged="EndPageCbB1_SelectionChanged" Visibility="Collapsed" Grid.Column="3" />
+                            <Button x:Name="StatisticsBtn" Content="统计" Margin="10,10,10,0" Click="StatisticsBtn_Click" RenderTransformOrigin="1.04,0.6" Grid.Column="7" VerticalAlignment="Top" Height="25"/>
+                            <Label Content="选择画图类型" Margin="10,180,10,0" Height="25" VerticalAlignment="Top" HorizontalContentAlignment="Center" Grid.ColumnSpan="2" BorderBrush="#FF25254B" Background="{x:Null}"/>
+                            <ComboBox x:Name="PicTypeCbB" Height="25" VerticalAlignment="Top" Margin="10,180,10,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Column="2" Grid.ColumnSpan="2">
+                                <ComboBoxItem Content="柱形图"/>
+                                <ComboBoxItem Content="折线图"/>
+                                <ComboBoxItem Content="饼图"/>
+                                <ComboBoxItem Content="分布图"/>
+                                <ComboBoxItem Content="散点图"/>
+                            </ComboBox>
+                            <Button x:Name="DrawBtn" Content="画图" Height="25" VerticalAlignment="Top" Margin="10,180,10,0" Click="DrawBtn_Click" Grid.Column="7"/>
+                            <Label Content="平均值：" Margin="10,45,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                            <Label x:Name="AvgLabel" Content="未知" Margin="10,45,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="25" Grid.Column="1" HorizontalContentAlignment="Center"/>
+                            <Label Content="方　差：" Margin="10,75,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                            <Label x:Name="Sd2Label" Content="未知" Margin="10,75,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="25" Grid.Column="1" HorizontalContentAlignment="Center"/>
+                            <Label Content="最大值：" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" Grid.Column="2" Margin="10,45,10,0" HorizontalContentAlignment="Center"/>
+                            <Label x:Name="MaxLabel" Content="未知" Margin="10,45,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="25" Grid.Column="3" HorizontalContentAlignment="Center"/>
+                            <Label Content="最小值：" Margin="10,75,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" Grid.Column="2" HorizontalContentAlignment="Center" />
+                            <Label x:Name="MinLabel" Content="未知" Margin="10,75,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="25" Grid.Column="3" HorizontalContentAlignment="Center"/>
+                            <Label Content="中位数：" Margin="10,45,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" Grid.Column="4" HorizontalContentAlignment="Center"/>
+                            <Label x:Name="MedianLabel" Content="未知" Margin="10,45,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="25" Grid.Column="5" HorizontalContentAlignment="Center"/>
+                            <Label Content="众　数：" Margin="10,75,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" Grid.Column="4" HorizontalContentAlignment="Center"/>
+                            <Label x:Name="ModeLabel" Content="未知" Margin="10,75,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="25" Grid.Column="5" HorizontalContentAlignment="Center"/>
+                            <Label Content="起始下标" Margin="10,110,10,0" VerticalAlignment="Top" Height="25" HorizontalContentAlignment="Center"/>
+                            <Label Content="结束下标" Margin="10,145,10,0" VerticalAlignment="Top" Height="25" HorizontalContentAlignment="Center"/>
+                            <Slider x:Name="StartSlider" Margin="10,110,10,0" VerticalAlignment="Top" Height="25" IsSnapToTickEnabled="True" TickPlacement="BottomRight" ValueChanged="StartSlider_ValueChanged" LargeChange="100" Grid.Column="1" Grid.ColumnSpan="4"/>
+                            <Slider x:Name="EndSlider" Margin="10,145,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" IsSnapToTickEnabled="True" TickPlacement="BottomRight" ValueChanged="EndSlider_ValueChanged" LargeChange="100" Grid.Column="1" Grid.ColumnSpan="4"/>
+                            <Label Content="{Binding Value, ElementName=StartSlider}" Margin="10,110,10,0" VerticalAlignment="Top" Height="25" MouseDoubleClick="Label_MouseDoubleClick" Grid.Column="5" HorizontalContentAlignment="Center" />
+                            <Label Content="{Binding Value, ElementName=EndSlider}" Margin="10,145,10,0" VerticalAlignment="Top" Height="25" MouseDoubleClick="Label_MouseDoubleClick_1" Grid.Column="5" HorizontalContentAlignment="Center"/>
+                            <Label Content="选择奶牛ID" Margin="10,10,10,0" VerticalAlignment="Top" Height="25" HorizontalContentAlignment="Center"/>
+                            <ComboBox x:Name="CowIdCbB" Margin="10,10,10,0" VerticalAlignment="Top" Height="25" Grid.Column="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                            <Label Content="选择阈值" Grid.Column="4" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
+                            <ComboBox x:Name="YuZhiCbB" Grid.Column="5" Margin="10,10,10,0" VerticalAlignment="Top" Height="25" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                <ComboBoxItem Content="0"/>
+                                <ComboBoxItem Content="1"/>
+                                <ComboBoxItem Content="2"/>
+                            </ComboBox>
+                            <Label Content="选择时段" Grid.Column="2" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
+                            <Button x:Name="SelectTimeBtn" Content="选择时段" Grid.Column="3" Margin="10,10,10,0" VerticalAlignment="Top" Height="25" Click="SelectTimeBtn_Click" />
+                            <Button x:Name="SmoothBtn" Content="平滑后统计" Grid.Column="6" Margin="10,45,10,0" VerticalAlignment="Top" Height="25" Click="SmoothBtn_Click"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="同环比增长" Grid.Row="1">
+                        <Grid Margin="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="135*"/>
+                                <ColumnDefinition Width="135*"/>
+                                <ColumnDefinition Width="94*"/>
+                                <ColumnDefinition Width="340*"/>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                    </GroupBox>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="设置" Height="30" VerticalAlignment="Top" Margin="0,20,0,-20">
+                <Grid>
+                    <Label Content="每一页的行数（默认3600）" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="160" Margin="10,10,0,0" VerticalContentAlignment="Center"/>
+                    <TextBox x:Name="RowPerPageTB" HorizontalAlignment="Left" Height="25" Margin="175,10,0,0" TextWrapping="Wrap" Text="3600" VerticalAlignment="Top" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                    <Button x:Name="ApplyBtn" Content="应用" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="30" Width="75" Click="ApplyBtn_Click"/>
+                    <Button x:Name="DefaultBtn" Content="重置" HorizontalAlignment="Right" Margin="0,0,90,10" VerticalAlignment="Bottom" Width="75" Height="30"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="单头奶牛" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="60" Margin="0,69,0,-59">
+                <Grid >
+                    <Label Content="选择奶牛ID" Margin="10,10,621,0" VerticalAlignment="Top"/>
+
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Image Source="Image/RProject2.png" Margin="0,10,0,0" Grid.RowSpan="2"/>
+
+
+    </Grid>
+</Window>

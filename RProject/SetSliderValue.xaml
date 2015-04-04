@@ -1,0 +1,12 @@
+﻿<Window x:Class="RProject.SetSliderValue"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         Height="150" Width="200" ResizeMode="CanMinimize" Icon="Image/RIcon40_3.png">
+    <Grid>
+        <TextBox x:Name="TB1" Margin="12,40,10,0" TextWrapping="Wrap" Text="" VerticalContentAlignment="Center" Height="25" VerticalAlignment="Top" KeyDown="TB1_KeyDown"/>
+        <Button x:Name="OKBtn" Content="确定" Margin="10,0,109,10" Click="OKBtn_Click" Height="30" VerticalAlignment="Bottom"/>
+        <Button x:Name="CancelBtn" Content="取消" Margin="109,0,10,10" Click="CancelBtn_Click" Height="30" VerticalAlignment="Bottom"/>
+        <Label x:Name="L1" Content="现在的值为 " Margin="12,10,10,0" Height="25" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

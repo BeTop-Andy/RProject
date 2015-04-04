@@ -1,0 +1,9 @@
+﻿<Window x:Name="LoadingWin" x:Class="RProject.Loading"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Loading..." Height="100" Width="450">
+    <Grid>
+        <ProgressBar Margin="10" IsIndeterminate="True"/>
+
+    </Grid>
+</Window>
