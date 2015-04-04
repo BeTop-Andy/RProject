@@ -382,7 +382,7 @@ namespace RProject
 
         private void SmoothBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show("吓死爹了");
         }
     }
 
