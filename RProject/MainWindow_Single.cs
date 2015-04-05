@@ -40,12 +40,6 @@ namespace RProject
 
         private void StatisticsBtn_Click(object sender, RoutedEventArgs e)
         {
-            double avg = 0;
-            double sd2 = 0;     //方差
-            int max = 0;
-            int min = 0;
-            int median = 0;     //中位数
-            int mode = 0;       //众数
             // 
             //             if (csvDt != null) {
             //                 int startIndex;
@@ -90,116 +84,137 @@ namespace RProject
             // 
             //                 }
             //             } else 
-            if (myConn != null) {
-                if (CowIdCbB.SelectedIndex == -1) {
-                    MessageBox.Show("请选择奶牛ID");
-                } else if (YuZhiCbB.SelectedIndex == -1) {
-                    MessageBox.Show("请选择阈值");
-                } else {
-                    int id = Convert.ToInt32(CowIdCbB.SelectedValue);
 
-                    if (ht.Contains(id) && ((SelectTime) ht[id]).isOK) {
-                        SelectTime stWin = (SelectTime) ht[id];
-                        List<int> l = new List<int>();
-                        string startDate;
-                        int startTime;
-                        string endDate;
-                        int endTime;
+            if (ReadDataToR()) {
+                StatisticsFromR();
+            }
+        }
 
-                        DateTime tempDate;
+        /// <summary>
+        /// R里变量名为Index
+        /// </summary>
+        /// <param name="cowId"></param>
+        private bool ReadDataToR()
+        {
+            int cowId = Convert.ToInt32(CowIdCbB.SelectedValue);
 
-                        string sqlComm;
-                        MySqlCommand comm;
-                        MySqlDataReader dr;
+            List<bool> condition = new List<bool> { myConn != null, CowIdCbB.SelectedIndex != -1, ht.Contains(cowId) && ((SelectTime) ht[cowId]).isOK, YuZhiCbB.SelectedIndex != -1 };
 
-                        l.Clear();
-                        for (int i = 0; i < stWin.dt.Rows.Count; i++) {
-                            startDate = stWin.dt.Rows[i][1].ToString();
-
-                            string temp = stWin.dt.Rows[i][2].ToString();
-                            temp = temp.Remove(temp.IndexOf(':'));
-                            startTime = Convert.ToInt32(temp);
-
-                            endDate = stWin.dt.Rows[i][3].ToString();
-
-                            temp = stWin.dt.Rows[i][4].ToString();
-                            temp = temp.Remove(temp.IndexOf(':'));
-                            endTime = Convert.ToInt32(temp);
-
-                            tempDate = Convert.ToDateTime(startDate);
-
-                            for (; tempDate <= Convert.ToDateTime(endDate); tempDate = tempDate.AddDays(1)) {
-                                int startIndex = 1;
-                                int endIndex = 24;
-
-                                if (tempDate == Convert.ToDateTime(startDate)) {
-                                    startIndex = startTime + 1;      //第一天
-                                } else if (tempDate == Convert.ToDateTime(endDate)) {
-                                    endIndex = endTime;             //最后一天
-                                } else {
-                                    startIndex = 1;
-                                }
-                                for (; startIndex <= endIndex; startIndex++) {
-                                    sqlComm = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", startIndex, tempDate.ToString("yyyy-M-d"), YuZhiCbB.SelectedIndex);
-                                    comm = new MySqlCommand(sqlComm, myConn);
-                                    dr = comm.ExecuteReader();
-                                    //MessageBox.Show(tempDate.ToString("yyyy-m-d"));
-                                    if (dr.Read()) {
-                                        //MessageBox.Show(dr.GetString(0));
-                                        l.Add(dr.GetInt32(0));
-                                    }
-                                    dr.Close();
-                                }
-
-                            }
-                        }
-
-                        StartSlider.Minimum = 1;
-                        StartSlider.Maximum = l.Count;
-                        EndSlider.Minimum = 1;
-                        EndSlider.Maximum = l.Count;
-                        EndSlider.Value = EndSlider.Maximum;
-
-                        string rComm = null;
-                        foreach (int i in l) {
-                            rComm += i + ",";
-                        }
-                        rComm = rComm.Substring(0, rComm.Length - 1);
-
-                        re.Evaluate("Index <- c(" + rComm + ")");
-
-                        try {
-                            avg = re.Evaluate("mean(Index)").AsNumeric()[0];
-                            avg = Math.Round(avg, 2);
-                            AvgLabel.Content = avg.ToString();
-
-                            sd2 = re.Evaluate("var(Index)").AsNumeric()[0];
-                            sd2 = Math.Round(sd2, 2);
-                            Sd2Label.Content = sd2.ToString();
-
-                            max = re.Evaluate("max(Index)").AsInteger()[0];
-                            MaxLabel.Content = max.ToString();
-
-                            min = re.Evaluate("min(Index)").AsInteger()[0];
-                            MinLabel.Content = min.ToString();
-
-                            median = re.Evaluate("median(Index)").AsInteger()[0];
-                            MedianLabel.Content = median.ToString();
-
-                            mode = Convert.ToInt32(re.Evaluate("names(which.max(table(Index)))").AsCharacter()[0]);
-                            ModeLabel.Content = mode.ToString();
-                        } catch {
-
-                        }
+            string[] msg = new string[] { "数据库连接失败", "请选择奶牛ID", "请选择时段并且确认按下了确定按钮", "请选择阈值" };
 
 
+            int index = condition.FindIndex(x => x == false);       //找不符合的
+            if (index != -1) {
+                MessageBox.Show(msg[index]);
+                return false;
+            }
+
+
+            SelectTime stWin = (SelectTime) ht[cowId];
+            List<int> l = new List<int>();
+            string startDate;
+            int startTime;
+            string endDate;
+            int endTime;
+
+            DateTime tempDate;
+
+            string sqlComm;
+            MySqlCommand comm;
+            MySqlDataReader dr;
+
+            l.Clear();
+            for (int i = 0; i < stWin.dt.Rows.Count; i++) {
+                startDate = stWin.dt.Rows[i][1].ToString();
+
+                string temp = stWin.dt.Rows[i][2].ToString();
+                temp = temp.Remove(temp.IndexOf(':'));
+                startTime = Convert.ToInt32(temp);
+
+                endDate = stWin.dt.Rows[i][3].ToString();
+
+                temp = stWin.dt.Rows[i][4].ToString();
+                temp = temp.Remove(temp.IndexOf(':'));
+                endTime = Convert.ToInt32(temp);
+
+                tempDate = Convert.ToDateTime(startDate);
+
+                for (; tempDate <= Convert.ToDateTime(endDate); tempDate = tempDate.AddDays(1)) {
+                    int startIndex = 1;
+                    int endIndex = 24;
+
+                    if (tempDate == Convert.ToDateTime(startDate)) {
+                        startIndex = startTime + 1;      //第一天
+                    } else if (tempDate == Convert.ToDateTime(endDate)) {
+                        endIndex = endTime;             //最后一天
                     } else {
-                        MessageBox.Show("请选择时段并且确认按下了确定按钮");
+                        startIndex = 1;
                     }
+                    for (; startIndex <= endIndex; startIndex++) {
+                        sqlComm = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", startIndex, tempDate.ToString("yyyy-M-d"), YuZhiCbB.SelectedIndex);
+                        comm = new MySqlCommand(sqlComm, myConn);
+                        dr = comm.ExecuteReader();
+                        //MessageBox.Show(tempDate.ToString("yyyy-m-d"));
+                        if (dr.Read()) {
+                            //MessageBox.Show(dr.GetString(0));
+                            l.Add(dr.GetInt32(0));
+                        }
+                        dr.Close();
+                    }
+
                 }
             }
 
+            StartSlider.Minimum = 1;
+            StartSlider.Maximum = l.Count;
+            EndSlider.Minimum = 1;
+            EndSlider.Maximum = l.Count;
+            EndSlider.Value = EndSlider.Maximum;
+
+            string rComm = null;
+            foreach (int i in l) {
+                rComm += i + ",";
+            }
+            rComm = rComm.Substring(0, rComm.Length - 1);
+
+            re.Evaluate("Index <- c(" + rComm + ")");
+
+
             hasStatic = true;
+            return true;
+        }
+
+        private void StatisticsFromR()
+        {
+            double avg = 0;
+            double sd2 = 0;     //方差
+            int max = 0;
+            int min = 0;
+            int median = 0;     //中位数
+            int mode = 0;       //众数
+            try {
+                avg = re.Evaluate("mean(Index)").AsNumeric()[0];
+                avg = Math.Round(avg, 2);
+                AvgLabel.Content = avg.ToString();
+
+                sd2 = re.Evaluate("var(Index)").AsNumeric()[0];
+                sd2 = Math.Round(sd2, 2);
+                Sd2Label.Content = sd2.ToString();
+
+                max = re.Evaluate("max(Index)").AsInteger()[0];
+                MaxLabel.Content = max.ToString();
+
+                min = re.Evaluate("min(Index)").AsInteger()[0];
+                MinLabel.Content = min.ToString();
+
+                median = re.Evaluate("median(Index)").AsInteger()[0];
+                MedianLabel.Content = median.ToString();
+
+                mode = Convert.ToInt32(re.Evaluate("names(which.max(table(Index)))").AsCharacter()[0]);
+                ModeLabel.Content = mode.ToString();
+            } catch {
+
+            }
         }
 
         private void DrawBtn_Click(object sender, RoutedEventArgs e)
@@ -231,15 +246,15 @@ namespace RProject
 
             if (hasStatic) {
                 int type = PicTypeCbB.SelectedIndex;
-                int startIndex = (int)StartSlider.Value;
+                int startIndex = (int) StartSlider.Value;
                 int endIndex = (int) EndSlider.Value;
 
                 switch (type) {
-                    case -1 :
+                    case -1:
                         MessageBox.Show("请选择画图类型");
                         break;
                     case 0:
-                        re.Evaluate(string.Format("plot(Index,type=\"h\",ylab=\"value\",xlim=c({0},{1}))",startIndex,endIndex));
+                        re.Evaluate(string.Format("plot(Index,type=\"h\",ylab=\"value\",xlim=c({0},{1}))", startIndex, endIndex));
                         break;
                     case 1:
                         re.Evaluate(string.Format("plot(Index,type=\"l\",ylab=\"value\",xlim=c({0},{1}))", startIndex, endIndex));
@@ -277,53 +292,53 @@ namespace RProject
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="type">类型：
-        /// 0：条形图
-        /// 1：折线图
-        /// 2：饼图
-        /// 3：分布图
-        /// 4：散点图
-        /// </param>
-        /// <param name="minIndex">最小值</param>
-        /// <param name="maxIndex">最大值</param>
-        /// <param name="startIndex">可视范围开始</param>
-        /// <param name="endIndex">可视范围结束</param>
-        private void DrawPic(DrawPar o)
-        {
-            int type = o.Type;
-            int minIndex = o.MinIndex;
-            int maxIndex = o.MaxIndex;
-            int startIndex = o.StartIndex;
-            int endIndex = o.EndIndex;
-
-
-            try {
-                switch (type) {
-                    case 0:
-                        re.Evaluate(string.Format("plot(tb[{0}:{1},1],type=\"h\",xlim=c({2},{3}),ylab=\"value\")", minIndex, maxIndex, startIndex, endIndex));
-                        break;
-                    case 1:
-                        re.Evaluate(string.Format("plot(tb[{0}:{1},1],type=\"l\",xlim=c({2},{3}),ylab=\"value\")", minIndex, maxIndex, startIndex, endIndex));
-                        break;
-                    case 2:
-                        re.Evaluate(string.Format("pie(tb[{0}:{1},1])", startIndex, endIndex));
-                        break;
-                    case 3:
-                        re.Evaluate(string.Format("plot(table(tb[{0}:{1},1]),ylab=\"value\")", startIndex, endIndex));
-                        break;
-                    case 4:
-                        re.Evaluate(string.Format("plot(tb[{0}:{1},1],type=\"p\",xlim=c({2},{3}),ylab=\"value\")", minIndex, maxIndex, startIndex, endIndex));
-                        break;
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
-
-            SetLoadingBarVisibilityInvoke(false);
-        }
+//         /// <summary>
+//         /// 
+//         /// </summary>
+//         /// <param name="type">类型：
+//         /// 0：条形图
+//         /// 1：折线图
+//         /// 2：饼图
+//         /// 3：分布图
+//         /// 4：散点图
+//         /// </param>
+//         /// <param name="minIndex">最小值</param>
+//         /// <param name="maxIndex">最大值</param>
+//         /// <param name="startIndex">可视范围开始</param>
+//         /// <param name="endIndex">可视范围结束</param>
+//         private void DrawPic(DrawPar o)
+//         {
+//             int type = o.Type;
+//             int minIndex = o.MinIndex;
+//             int maxIndex = o.MaxIndex;
+//             int startIndex = o.StartIndex;
+//             int endIndex = o.EndIndex;
+// 
+// 
+//             try {
+//                 switch (type) {
+//                     case 0:
+//                         re.Evaluate(string.Format("plot(tb[{0}:{1},1],type=\"h\",xlim=c({2},{3}),ylab=\"value\")", minIndex, maxIndex, startIndex, endIndex));
+//                         break;
+//                     case 1:
+//                         re.Evaluate(string.Format("plot(tb[{0}:{1},1],type=\"l\",xlim=c({2},{3}),ylab=\"value\")", minIndex, maxIndex, startIndex, endIndex));
+//                         break;
+//                     case 2:
+//                         re.Evaluate(string.Format("pie(tb[{0}:{1},1])", startIndex, endIndex));
+//                         break;
+//                     case 3:
+//                         re.Evaluate(string.Format("plot(table(tb[{0}:{1},1]),ylab=\"value\")", startIndex, endIndex));
+//                         break;
+//                     case 4:
+//                         re.Evaluate(string.Format("plot(tb[{0}:{1},1],type=\"p\",xlim=c({2},{3}),ylab=\"value\")", minIndex, maxIndex, startIndex, endIndex));
+//                         break;
+//                 }
+//             } catch (Exception ex) {
+//                 MessageBox.Show(ex.Message);
+//             }
+// 
+//             SetLoadingBarVisibilityInvoke(false);
+//         }
 
         private void Label_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -382,65 +397,97 @@ namespace RProject
 
         private void SmoothBtn_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("吓死爹了");
+            if (ReadDataToR()) {
+                /*my_func_smooth <- function(data, smooth_length){
+                    #初始化变量,增加第一个非平滑值保持长度。
+                    my_smooth_data <- NULL;
+                    for(i in 1:length(data)){
+                        #处理大于平滑长度的数据
+                        my_data_start <- (i-(smooth_length)+1);
+                        #处理小于平滑长度的数据
+                        if(i < smooth_length) my_data_start <- 1;
+                        my_smooth_data <- c(my_smooth_data, mean(data[my_data_start:i]));
+                    }
+                    #返回平滑值
+                    return (my_smooth_data);
+                }*/
+                string RSmoothStr = 
+                    @"my_func_smooth <- function(data, smooth_length){
+                      my_smooth_data <- NULL;
+                      for(i in 1:length(data)){
+                        my_data_start <- (i-(smooth_length)+1);
+                        if(i < smooth_length) my_data_start <- 1;
+                        my_smooth_data <- c(my_smooth_data, mean(data[my_data_start:i]));
+                      }
+                      return (my_smooth_data);
+                    }";
+                re.Evaluate(RSmoothStr);
+                re.Evaluate("Index <- my_func_smooth(Index,8)");
+
+                StatisticsFromR();
+            }
+
         }
+
+
+
     }
-
-    public class DrawPar
-    {
-        private int type;
-
-        public int Type
-        {
-            get { return type; }
-            set { type = value; }
-        }
-        private int minIndex;
-
-        public int MinIndex
-        {
-            get { return minIndex; }
-            set { minIndex = value; }
-        }
-        private int maxIndex;
-
-        public int MaxIndex
-        {
-            get { return maxIndex; }
-            set { maxIndex = value; }
-        }
-        private int startIndex;
-
-        public int StartIndex
-        {
-            get { return startIndex; }
-            set { startIndex = value; }
-        }
-        private int endIndex;
-
-        public int EndIndex
-        {
-            get { return endIndex; }
-            set { endIndex = value; }
-        }
-
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="t">type</param>
-        /// <param name="m">minIndex</param>
-        /// <param name="max">maxIndex</param>
-        /// <param name="s">startIndex</param>
-        /// <param name="e">endIndex</param>
-        public DrawPar(int t, int m, int max, int s, int e)
-        {
-            type = t;
-            minIndex = m;
-            maxIndex = max;
-            startIndex = s;
-            endIndex = e;
-        }
-    }
+// 
+//     public class DrawPar
+//     {
+//         private int type;
+// 
+//         public int Type
+//         {
+//             get { return type; }
+//             set { type = value; }
+//         }
+//         private int minIndex;
+// 
+//         public int MinIndex
+//         {
+//             get { return minIndex; }
+//             set { minIndex = value; }
+//         }
+//         private int maxIndex;
+// 
+//         public int MaxIndex
+//         {
+//             get { return maxIndex; }
+//             set { maxIndex = value; }
+//         }
+//         private int startIndex;
+// 
+//         public int StartIndex
+//         {
+//             get { return startIndex; }
+//             set { startIndex = value; }
+//         }
+//         private int endIndex;
+// 
+//         public int EndIndex
+//         {
+//             get { return endIndex; }
+//             set { endIndex = value; }
+//         }
+// 
+// 
+// 
+//         /// <summary>
+//         /// 
+//         /// </summary>
+//         /// <param name="t">type</param>
+//         /// <param name="m">minIndex</param>
+//         /// <param name="max">maxIndex</param>
+//         /// <param name="s">startIndex</param>
+//         /// <param name="e">endIndex</param>
+//         public DrawPar(int t, int m, int max, int s, int e)
+//         {
+//             type = t;
+//             minIndex = m;
+//             maxIndex = max;
+//             startIndex = s;
+//             endIndex = e;
+//         }
+//     }
 }

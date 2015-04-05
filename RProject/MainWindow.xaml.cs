@@ -37,7 +37,11 @@ namespace RProject
             InitializeComponent();
 
             myConn = new MySqlConnection("Database=test;Data Source=127.0.0.1;User Id=root;Password=123456;pooling=false;CharSet=utf8;port=3306");
-            myConn.Open();
+            try {
+                myConn.Open();
+            } catch {
+                MessageBox.Show("", "数据库连接失败");
+            }
 
             re = REngine.CreateInstance("R");
             re.Initialize();

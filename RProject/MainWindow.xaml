@@ -79,7 +79,7 @@
                                 <ComboBoxItem Content="分布图"/>
                                 <ComboBoxItem Content="散点图"/>
                             </ComboBox>
-                            <Button x:Name="DrawBtn" Content="画图" Height="25" VerticalAlignment="Top" Margin="10,180,10,0" Click="DrawBtn_Click" Grid.Column="7"/>
+                            <Button x:Name="DrawBtn" Content="画图" Height="25" VerticalAlignment="Top" Margin="10,180,10,0" Click="DrawBtn_Click" Grid.Column="6"/>
                             <Label Content="平均值：" Margin="10,45,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                             <Label x:Name="AvgLabel" Content="未知" Margin="10,45,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="25" Grid.Column="1" HorizontalContentAlignment="Center"/>
                             <Label Content="方　差：" Margin="10,75,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
