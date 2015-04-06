@@ -153,13 +153,12 @@ namespace RProject
                     for (; startIndex <= endIndex; startIndex++) {
                         sqlComm = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", startIndex, tempDate.ToString("yyyy-M-d"), YuZhiCbB.SelectedIndex);
                         comm = new MySqlCommand(sqlComm, myConn);
-                        dr = comm.ExecuteReader();
-                        //MessageBox.Show(tempDate.ToString("yyyy-m-d"));
-                        if (dr.Read()) {
-                            //MessageBox.Show(dr.GetString(0));
-                            l.Add(dr.GetInt32(0));
+
+                        using (dr = comm.ExecuteReader()) {
+                            if (dr.Read()) {
+                                l.Add(dr.GetInt32(0));
+                            }
                         }
-                        dr.Close();
                     }
 
                 }
@@ -249,23 +248,24 @@ namespace RProject
                 int startIndex = (int) StartSlider.Value;
                 int endIndex = (int) EndSlider.Value;
 
-                switch (type) {
-                    case -1:
+
+                switch (Enum.GetName(typeof(typeEnum),type)) {
+                    case "没图":          //没选择
                         MessageBox.Show("请选择画图类型");
                         break;
-                    case 0:
+                    case "柱形图":
                         re.Evaluate(string.Format("plot(Index,type=\"h\",ylab=\"value\",xlim=c({0},{1}))", startIndex, endIndex));
                         break;
-                    case 1:
+                    case "折线图":
                         re.Evaluate(string.Format("plot(Index,type=\"l\",ylab=\"value\",xlim=c({0},{1}))", startIndex, endIndex));
                         break;
-                    case 2:
+                    case "饼图":
                         re.Evaluate(string.Format("pie(Index)"));
                         break;
-                    case 3:
+                    case "分布图":
                         re.Evaluate(string.Format("plot(table(Index[{0}:{1}]),ylab=\"value\")", startIndex, endIndex));
                         break;
-                    case 4:
+                    case "散点图":
                         re.Evaluate(string.Format("plot(Index,type=\"p\",ylab=\"value\",xlim=c({0},{1}))", startIndex, endIndex));
                         break;
                 }
@@ -368,27 +368,27 @@ namespace RProject
                 string commText = "select min(date),max(date) from `data` where cowId = " + id;
 
                 MySqlCommand comm = new MySqlCommand(commText, myConn);
-                MySqlDataReader dr = comm.ExecuteReader();
-                DateTime sd;            //StartDate
-                DateTime ed;            //EndDate
+                using (MySqlDataReader dr = comm.ExecuteReader()) {
+                    DateTime sd;            //StartDate
+                    DateTime ed;            //EndDate
 
-                if (dr.Read()) {
-                    sd = dr.GetDateTime(0);
-                    ed = dr.GetDateTime(1);
-                    //MessageBox.Show(sd.ToShortDateString() + ed.ToShortDateString());
-                    SelectTime stWin;
+                    if (dr.Read()) {
+                        sd = dr.GetDateTime(0);
+                        ed = dr.GetDateTime(1);
+                        //MessageBox.Show(sd.ToShortDateString() + ed.ToShortDateString());
+                        SelectTime stWin;
 
-                    if (ht.Contains(id)) {
-                        stWin = (SelectTime) ht[id];
-                    } else {
-                        stWin = new SelectTime(sd, ed);
-                        ht.Add(id, stWin);
+                        if (ht.Contains(id)) {
+                            stWin = (SelectTime) ht[id];
+                        } else {
+                            stWin = new SelectTime(sd, ed);
+                            ht.Add(id, stWin);
+                        }
+
+                        stWin.isOK = false;
+                        stWin.ShowDialog();
                     }
-
-                    stWin.isOK = false;
-                    stWin.ShowDialog();
                 }
-                dr.Close();
             } else {
                 MessageBox.Show("请选择奶牛ID");
             }
@@ -398,7 +398,8 @@ namespace RProject
         private void SmoothBtn_Click(object sender, RoutedEventArgs e)
         {
             if (ReadDataToR()) {
-                /*my_func_smooth <- function(data, smooth_length){
+                /*R语言
+                my_func_smooth <- function(data, smooth_length){
                     #初始化变量,增加第一个非平滑值保持长度。
                     my_smooth_data <- NULL;
                     for(i in 1:length(data)){
@@ -430,8 +431,20 @@ namespace RProject
         }
 
 
-
     }
+
+
+    enum typeEnum
+    {
+        没图 = -1,
+        柱形图 = 0,
+        折线图 = 1,
+        饼图 = 2,
+        分布图 = 3,
+        散点图 = 4,
+    };
+
+
 // 
 //     public class DrawPar
 //     {

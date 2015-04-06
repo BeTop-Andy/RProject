@@ -47,11 +47,11 @@ namespace RProject
             re.Initialize();
 
             MySqlCommand comm = new MySqlCommand("SELECT DISTINCT cowId from `data`;", myConn);
-            MySqlDataReader dr = comm.ExecuteReader();
-            while (dr.Read()) {
-                CowIdCbB.Items.Add(dr.GetString(0));
+            using (MySqlDataReader dr = comm.ExecuteReader()) {
+                while (dr.Read()) {
+                    CowIdCbB.Items.Add(dr.GetString(0));
+                }
             }
-            dr.Close();
         }
 
         private void ReadBtn_Click(object sender, RoutedEventArgs e)
