@@ -1,15 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Data;
 
 namespace RProject
@@ -53,7 +43,6 @@ namespace RProject
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             if (StartDateDP.SelectedDate == null) {
-                //MessageBox.Show("请选择开始日期");
                 StartDateDP.SelectedDate = StartDateDP.DisplayDateStart;
             }
             DateTime sd = (DateTime) StartDateDP.SelectedDate;
@@ -73,6 +62,8 @@ namespace RProject
 
             if (sd == ed && st >= et) {
                 MessageBox.Show("同一天时，开始时间不能晚于结束时间", "错误");
+            } else if(sd > ed) {
+                MessageBox.Show("开始日期不能晚于结束日期");
             } else {
                 if (!isUpdate) {
                     DataRow dr = dt.NewRow();
@@ -91,7 +82,7 @@ namespace RProject
                     isUpdate = false;
                     updateIndex = -1;
                 }
-            }
+            } 
         }
 
 
@@ -106,7 +97,6 @@ namespace RProject
         private void DelBtn_Click(object sender, RoutedEventArgs e)
         {
             int index = TimeDG.SelectedIndex;
-            //MessageBox.Show(dt.Rows[index][0].ToString(),index.ToString());
 
             if (index > -1) {
                 MessageBoxResult r = MessageBox.Show("将要删除ID-" + index, "警告", MessageBoxButton.OKCancel);
@@ -121,7 +111,6 @@ namespace RProject
         private void UpdateBtn_Click(object sender, RoutedEventArgs e)
         {
             int index = TimeDG.SelectedIndex;
-            //MessageBox.Show(dt.Rows[index][0].ToString(),index.ToString());
 
             if (index > -1) {
                 StartDateDP.DisplayDate = Convert.ToDateTime(dt.Rows[index][1]);
@@ -150,45 +139,5 @@ namespace RProject
             this.Hide();
             e.Cancel = true;
         }
-
     }
-// 
-//     public class Time
-//     {
-//         private DateTime startDate;
-//         public DateTime StartDate
-//         {
-//             get { return startDate; }
-//             set { startDate = value; }
-//         }
-// 
-//         private DateTime endDate;
-//         public DateTime EndDate
-//         {
-//             get { return endDate; }
-//             set { endDate = value; }
-//         }
-// 
-//         private int startTime;
-//         public int StartTime
-//         {
-//             get { return startTime; }
-//             set { startTime = value; }
-//         }
-// 
-//         private int endTime;
-//         public int EndTime
-//         {
-//             get { return endTime; }
-//             set { endTime = value; }
-//         }
-// 
-//         public Time(DateTime startDate, int startTime, DateTime endDate, int endTime)
-//         {
-//             this.StartDate = startDate;
-//             this.StartTime = startTime;
-//             this.endDate = endDate;
-//             this.endTime = endTime;
-//         }
-//     }
 }

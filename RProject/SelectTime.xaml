@@ -73,7 +73,7 @@
         <Button x:Name="UpdateBtn" Content="修改" Grid.Column="2" Margin="0,0,10,40" Grid.ColumnSpan="2" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="136" Click="UpdateBtn_Click"/>
         <Button x:Name="DelBtn" Content="删除" Margin="10,0,0,40" Grid.ColumnSpan="2" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="136" Click="DelBtn_Click"/>
         <Button x:Name="YesBtn" Content="确定" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Grid.ColumnSpan="4" Click="YesBtn_Click"/>
-        <DatePicker x:Name="StartDateDP" Margin="10,40,10,0" VerticalAlignment="Top" DisplayDate="2015-04-03"/>
+        <DatePicker x:Name="StartDateDP" Margin="10,40,10,0" VerticalAlignment="Top" />
         <DatePicker x:Name="EndDateDP" Grid.Column="2" Margin="10,40,10,0" VerticalAlignment="Top"/>
         <DataGrid x:Name="TimeDG" Margin="10,110,10,70" Grid.ColumnSpan="4" IsReadOnly="True"/>
 

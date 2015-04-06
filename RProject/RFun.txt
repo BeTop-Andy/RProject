@@ -1,0 +1,53 @@
+﻿#----------------------------------
+#平滑
+#compute the smooth
+my_func_smooth <- function(data, smooth_length){
+  #初始化变量,增加第一个非平滑值保持长度。
+  my_smooth_data <- NULL;
+  for(i in 1:length(data)){
+    #处理大于平滑长度的数据
+    my_data_start <- (i-(smooth_length)+1);
+    #处理小于平滑长度的数据
+    if(i < smooth_length) my_data_start <- 1;
+    my_smooth_data <- c(my_smooth_data, mean(data[my_data_start:i]));
+  }
+  #返回平滑值
+  return (my_smooth_data)
+}
+
+#----------------------------------
+#同比
+#compute the cross by mean and sd
+my_func_cross <- function(my_smooth_data, total_days, compare_dates){
+  my_cross_mean <- vector(length = 0);
+  my_cross_sd <- vector(length = 0);
+  my_average <- NULL; 
+  for(i in 4:total_days){
+    for(j in 1:24){
+      #处理大于横向比较天数的数据
+      my_cross_seq <- seq(from=(((i-1)-compare_dates)*24+j),length.out=compare_dates, by=24);
+      #处理小于横向比较天数的数据
+      if( i < (compare_dates+1)) my_cross_seq <- seq(from=j, length.out=(i-1), by=24);
+      my_cross_data <- my_smooth_data[my_cross_seq];
+      my_current_data <- my_smooth_data[(i-1)*24+j];
+      
+      #compute the diff rate of mean sd.
+      my_average <- mean(my_cross_data);
+      my_sd <- sd(my_cross_data);
+      my_cross_mean <- c(my_cross_mean, (my_current_data - my_average)/my_average);
+      my_cross_sd <- c(my_cross_sd, (my_current_data - my_average)/my_sd);
+    }
+  }
+  #fit the blank
+  my_cross_mean <- c(rep(0,times=24*3), my_cross_mean);
+  my_cross_sd <- c(rep(0,times=24*3), my_cross_sd);
+#   dim(my_cross_mean) <- c(length(my_cross_mean),1);
+#   dim(my_cross_sd) <- c(length(my_cross_sd),1);
+  #将除零的结果计为零。
+  my_cross_mean[(!is.finite(my_cross_mean))] = 0;
+  my_cross_sd[(!is.finite(my_cross_sd))] = 0;
+  #   dim(my_cross_mean) <- c(24,total_days);
+  #   dim(my_cross_sd) <- c(24,total_days);
+  #  my_return_list <- list(my_cross_mean, my_cross_sd);
+  return (list(my_cross_mean, my_cross_sd));
+}   
