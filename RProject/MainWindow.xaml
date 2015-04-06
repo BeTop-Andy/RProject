@@ -49,10 +49,9 @@
             <TabItem Header="单头奶牛" Margin="0,9,0,-20" RenderTransformOrigin="0.5,0.5">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="85*"/>
-                        <RowDefinition Height="64*"/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <GroupBox Header="统计&amp;画图" VerticalAlignment="Top" Height="255">
+                    <GroupBox Header="统计&amp;画图" Height="237" VerticalAlignment="Top">
                         <Grid Margin="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="100*"/>
@@ -111,13 +110,11 @@
                             <Button x:Name="SmoothBtn" Content="平滑后统计" Grid.Column="6" Margin="10,45,10,0" VerticalAlignment="Top" Height="25" Click="SmoothBtn_Click"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="同环比增长" Grid.Row="1">
+                    <GroupBox Header="同环比增长" Margin="0,237,0,0">
                         <Grid Margin="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="135*"/>
-                                <ColumnDefinition Width="135*"/>
-                                <ColumnDefinition Width="94*"/>
-                                <ColumnDefinition Width="340*"/>
+                                <ColumnDefinition Width="133*"/>
+                                <ColumnDefinition Width="133*"/>
                             </Grid.ColumnDefinitions>
                         </Grid>
                     </GroupBox>

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Linq;
 
 namespace RProject
 {
@@ -84,17 +85,18 @@ namespace RProject
             // 
             //                 }
             //             } else 
-
-            if (ReadDataToR()) {
-                StatisticsFromR();
+            string varName = null;
+            if (ReadDataToR(ref varName)) {
+                StatisticsByR(varName);
             }
         }
 
         /// <summary>
-        /// R里变量名为Index
+        /// 读数据到R中
         /// </summary>
-        /// <param name="cowId"></param>
-        private bool ReadDataToR()
+        /// <param name="varName">变量名字</param>
+        /// <returns>是否成功</returns>
+        private bool ReadDataToR(ref string varName)
         {
             int cowId = Convert.ToInt32(CowIdCbB.SelectedValue);
 
@@ -170,20 +172,17 @@ namespace RProject
             EndSlider.Maximum = l.Count;
             EndSlider.Value = EndSlider.Maximum;
 
-            string rComm = null;
-            foreach (int i in l) {
-                rComm += i + ",";
-            }
-            rComm = rComm.Substring(0, rComm.Length - 1);
-
-            re.Evaluate("Index <- c(" + rComm + ")");
-
+            varName = RCommand.LoadingDataToR(l);
 
             hasStatic = true;
             return true;
         }
 
-        private void StatisticsFromR()
+        /// <summary>
+        /// 用R统计平均值等……
+        /// </summary>
+        /// <param name="varName">R里的变量名</param>
+        private void StatisticsByR(string varName)
         {
             double avg = 0;
             double sd2 = 0;     //方差
@@ -192,24 +191,22 @@ namespace RProject
             int median = 0;     //中位数
             int mode = 0;       //众数
             try {
-                avg = re.Evaluate("mean(Index)").AsNumeric()[0];
-                avg = Math.Round(avg, 2);
+                avg = RCommand.Avg(varName);
                 AvgLabel.Content = avg.ToString();
 
-                sd2 = re.Evaluate("var(Index)").AsNumeric()[0];
-                sd2 = Math.Round(sd2, 2);
+                sd2 = RCommand.Var(varName);
                 Sd2Label.Content = sd2.ToString();
 
-                max = re.Evaluate("max(Index)").AsInteger()[0];
+                max = RCommand.Max(varName); 
                 MaxLabel.Content = max.ToString();
 
-                min = re.Evaluate("min(Index)").AsInteger()[0];
+                min = RCommand.Min(varName); 
                 MinLabel.Content = min.ToString();
 
-                median = re.Evaluate("median(Index)").AsInteger()[0];
+                median = RCommand.Median(varName); 
                 MedianLabel.Content = median.ToString();
 
-                mode = Convert.ToInt32(re.Evaluate("names(which.max(table(Index)))").AsCharacter()[0]);
+                mode = RCommand.Mode(varName);
                 ModeLabel.Content = mode.ToString();
             } catch {
 
@@ -245,29 +242,13 @@ namespace RProject
 
             if (hasStatic) {
                 int type = PicTypeCbB.SelectedIndex;
+                string varName = "Index";
                 int startIndex = (int) StartSlider.Value;
                 int endIndex = (int) EndSlider.Value;
-
-
-                switch (Enum.GetName(typeof(typeEnum),type)) {
-                    case "没图":          //没选择
-                        MessageBox.Show("请选择画图类型");
-                        break;
-                    case "柱形图":
-                        re.Evaluate(string.Format("plot(Index,type=\"h\",ylab=\"value\",xlim=c({0},{1}))", startIndex, endIndex));
-                        break;
-                    case "折线图":
-                        re.Evaluate(string.Format("plot(Index,type=\"l\",ylab=\"value\",xlim=c({0},{1}))", startIndex, endIndex));
-                        break;
-                    case "饼图":
-                        re.Evaluate(string.Format("pie(Index)"));
-                        break;
-                    case "分布图":
-                        re.Evaluate(string.Format("plot(table(Index[{0}:{1}]),ylab=\"value\")", startIndex, endIndex));
-                        break;
-                    case "散点图":
-                        re.Evaluate(string.Format("plot(Index,type=\"p\",ylab=\"value\",xlim=c({0},{1}))", startIndex, endIndex));
-                        break;
+                if (type == -1) {
+                    MessageBox.Show("请选择图的类型");
+                } else {
+                    RCommand.DrawByR(type, varName, startIndex, endIndex);
                 }
             } else {
                 MessageBox.Show("请选进行【统计】操作");
@@ -375,7 +356,7 @@ namespace RProject
                     if (dr.Read()) {
                         sd = dr.GetDateTime(0);
                         ed = dr.GetDateTime(1);
-                        //MessageBox.Show(sd.ToShortDateString() + ed.ToShortDateString());
+
                         SelectTime stWin;
 
                         if (ht.Contains(id)) {
@@ -397,35 +378,12 @@ namespace RProject
 
         private void SmoothBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (ReadDataToR()) {
-                /*R语言
-                my_func_smooth <- function(data, smooth_length){
-                    #初始化变量,增加第一个非平滑值保持长度。
-                    my_smooth_data <- NULL;
-                    for(i in 1:length(data)){
-                        #处理大于平滑长度的数据
-                        my_data_start <- (i-(smooth_length)+1);
-                        #处理小于平滑长度的数据
-                        if(i < smooth_length) my_data_start <- 1;
-                        my_smooth_data <- c(my_smooth_data, mean(data[my_data_start:i]));
-                    }
-                    #返回平滑值
-                    return (my_smooth_data);
-                }*/
-                string RSmoothStr = 
-                    @"my_func_smooth <- function(data, smooth_length){
-                      my_smooth_data <- NULL;
-                      for(i in 1:length(data)){
-                        my_data_start <- (i-(smooth_length)+1);
-                        if(i < smooth_length) my_data_start <- 1;
-                        my_smooth_data <- c(my_smooth_data, mean(data[my_data_start:i]));
-                      }
-                      return (my_smooth_data);
-                    }";
-                re.Evaluate(RSmoothStr);
-                re.Evaluate("Index <- my_func_smooth(Index,8)");
+            string varName = null;
+            if (ReadDataToR(ref varName)) {
+                RCommand.LoadingSmoothFunToR();
+                RCommand.SmoothByR(varName);
 
-                StatisticsFromR();
+                StatisticsByR(varName);
             }
 
         }
@@ -434,15 +392,6 @@ namespace RProject
     }
 
 
-    enum typeEnum
-    {
-        没图 = -1,
-        柱形图 = 0,
-        折线图 = 1,
-        饼图 = 2,
-        分布图 = 3,
-        散点图 = 4,
-    };
 
 
 // 
