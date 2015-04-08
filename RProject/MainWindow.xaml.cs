@@ -49,7 +49,7 @@ namespace RProject
             MySqlCommand comm = new MySqlCommand("SELECT DISTINCT cowId from `data`;", myConn);
             using (MySqlDataReader dr = comm.ExecuteReader()) {
                 while (dr.Read()) {
-                    CowIdCbB.Items.Add(dr.GetString(0));
+                    Sigle_CowIdCbB.Items.Add(dr.GetString(0));
                 }
             }
         }
@@ -247,6 +247,8 @@ namespace RProject
             SetDataGrid1ItemSourceInvoke(csvDt.DefaultView);
             SetLoadingBarVisibilityInvoke(false);
         }
+
+
 
         
 

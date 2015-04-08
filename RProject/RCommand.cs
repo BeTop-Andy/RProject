@@ -195,22 +195,24 @@ namespace RProject
         /// <param name="varName">R里的变量名</param>
         /// <param name="total_days">总天数</param>
         /// <param name="compare_dates">要对比的天数（向前x天）</param>
-        public static void CrossAndDrawByR(string varName, int total_days, int compare_dates)
+        /// <param name="xMin">X轴可视范围开始</param>
+        /// <param name="xMax">X轴可视范围结束</param>
+        public static void CrossAndDrawByR(string varName, int total_days, int compare_dates, int xMin, int xMax)
         {
             REngine re = REngine.GetInstanceFromID("R");
 
             GenericVector gv = re.Evaluate(string.Format("List <- my_func_cross({0},{1},{2})", varName, total_days, compare_dates)).AsList();
 
-            double max = gv[0].AsNumeric().Max();
+            double yMax = gv[0].AsNumeric().Max();
             if (gv[0].AsNumeric().Max() < gv[1].AsNumeric().Max()) {
-                max = gv[1].AsNumeric().Max();
+                yMax = gv[1].AsNumeric().Max();
             }
-            double min = gv[0].AsNumeric().Min();
+            double yMin = gv[0].AsNumeric().Min();
             if (gv[0].AsNumeric().Min() > gv[1].AsNumeric().Min()) {
-                min = gv[1].AsNumeric().Min();
+                yMin = gv[1].AsNumeric().Min();
             }
 
-            re.Evaluate(string.Format("plot(List[[1]],type=\"l\",ylim=c({0},{1}),ylab=\"value\",col=\"blue\")",min-1,max+1));
+            re.Evaluate(string.Format("plot(List[[1]],type=\"l\",ylim=c({0},{1}),xlim=c({2},{3}),ylab=\"value\",col=\"blue\")",yMin-1,yMax+1,xMin,xMax));
             re.Evaluate("lines(List[[2]],col=\"red\")");
             string legendStr = "legend(\"topleft\",legend=c(\"AVG\",\"SD\"),col=c(\"blue\",\"red\"),lty=1,lwd=1,cex=1)";
             re.Evaluate(legendStr);

@@ -98,9 +98,9 @@ namespace RProject
         /// <returns>是否成功</returns>
         private bool ReadDataToR(ref string varName)
         {
-            int cowId = Convert.ToInt32(CowIdCbB.SelectedValue);
+            int cowId = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
 
-            List<bool> condition = new List<bool> { myConn != null, CowIdCbB.SelectedIndex != -1, ht.Contains(cowId) && ((SelectTime) ht[cowId]).isOK, YuZhiCbB.SelectedIndex != -1 };
+            List<bool> condition = new List<bool> { myConn != null, Sigle_CowIdCbB.SelectedIndex != -1, ht.Contains(cowId) && ((SelectTime) ht[cowId]).isOK, Single_ThresholdCbB.SelectedIndex != -1 };
 
             string[] msg = new string[] { "数据库连接失败", "请选择奶牛ID", "请选择时段并且确认按下了确定按钮", "请选择阈值" };
 
@@ -153,7 +153,7 @@ namespace RProject
                         startIndex = 1;
                     }
                     for (; startIndex <= endIndex; startIndex++) {
-                        sqlComm = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", startIndex, tempDate.ToString("yyyy-M-d"), YuZhiCbB.SelectedIndex);
+                        sqlComm = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", startIndex, tempDate.ToString("yyyy-M-d"), Single_ThresholdCbB.SelectedIndex);
                         comm = new MySqlCommand(sqlComm, myConn);
 
                         using (dr = comm.ExecuteReader()) {
@@ -346,8 +346,8 @@ namespace RProject
 
         private void SelectTimeBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (myConn != null && CowIdCbB.SelectedIndex != -1) {
-                int id = Convert.ToInt32(CowIdCbB.SelectedValue);
+            if (myConn != null && Sigle_CowIdCbB.SelectedIndex != -1) {
+                int id = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
                 string commText = "select min(date),max(date) from `data` where cowId = " + id;
 
                 MySqlCommand comm = new MySqlCommand(commText, myConn);
@@ -396,7 +396,7 @@ namespace RProject
             StartDateDP.SelectedDate = null;
             EndDateDP.SelectedDate = null;
 
-            int cowId = Convert.ToInt32(CowIdCbB2.SelectedValue);
+            int cowId = Convert.ToInt32(Sigle_CowIdCbB2.SelectedValue);
             string commText = "select min(date),max(date) from `data` where cowId = " + cowId;
 
             MySqlCommand comm = new MySqlCommand(commText, myConn);
@@ -412,7 +412,7 @@ namespace RProject
 
         private bool ReadDataToR_2(ref string varName)
         {
-            List<bool> condition = new List<bool> { myConn != null, CowIdCbB2.SelectedIndex != -1, StartDateDP.SelectedDate != null, EndDateDP.SelectedDate != null, ThresholdCbB.SelectedIndex != -1 };
+            List<bool> condition = new List<bool> { myConn != null, Sigle_CowIdCbB2.SelectedIndex != -1, StartDateDP.SelectedDate != null, EndDateDP.SelectedDate != null, Sigle_ThresholdCbB.SelectedIndex != -1 };
 
             string[] msg = new string[] { "数据库连接失败", "请选择奶牛ID", "请选择开始日期", "请选择结束日期", "请选择阈值" };
 
@@ -421,7 +421,7 @@ namespace RProject
                 MessageBox.Show(msg[index]);
                 return false;
             }
-            if ((EndDateDP.SelectedDate.Value - 
+            if ((EndDateDP.SelectedDate.Value -
                 StartDateDP.SelectedDate.Value).Days <= 0) {
                 MessageBox.Show("结束日期必须在开始日期之后");
                 return false;
@@ -429,10 +429,10 @@ namespace RProject
 
 
 
-            int cowId = Convert.ToInt32(CowIdCbB.SelectedValue);
+            int cowId = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
             DateTime sd = StartDateDP.SelectedDate.Value;
             DateTime ed = EndDateDP.SelectedDate.Value;
-            int threshold = ThresholdCbB.SelectedIndex;
+            int threshold = Sigle_ThresholdCbB.SelectedIndex;
 
             string commStr;
             MySqlCommand mySqlComm;
@@ -456,6 +456,25 @@ namespace RProject
 
             return true;
         }
+        private void StartDateDP_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (EndDateDP.SelectedDate != null) {
+                int daysLength = (EndDateDP.SelectedDate.Value - StartDateDP.SelectedDate.Value).Days;
+                StartSlider.Maximum = daysLength * 24;
+                EndSlider.Maximum = daysLength * 24;
+                EndSlider.Value = EndSlider.Maximum;
+            }
+        }
+
+        private void EndDateDP_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (StartDateDP.SelectedDate != null) {
+                int daysLength = (EndDateDP.SelectedDate.Value - StartDateDP.SelectedDate.Value).Days;
+                StartSlider.Maximum = daysLength * 24;
+                EndSlider.Maximum = daysLength * 24;
+                EndSlider.Value = EndSlider.Maximum;
+            }
+        }
 
         private void TongbiBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -469,25 +488,22 @@ namespace RProject
                 return;
             }
 
-
-
-
             if (ReadDataToR_2(ref varName)) {
                 int totalDays = (EndDateDP.SelectedDate.Value - StartDateDP.SelectedDate.Value).Days;
+                int xMin = (int) StartSlider.Value;
+                int xMax = (int) EndSlider.Value;
                 RCommand.LoadingSmoothFunToR();
                 RCommand.LoadingCrossFunToR();
                 RCommand.SmoothByR(varName);
-                RCommand.CrossAndDrawByR(varName, totalDays, compareDays);
+                RCommand.CrossAndDrawByR(varName, totalDays, compareDays, xMin, xMax);
             }
-
-
         }
 
+        private void HuanbiBtn_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
     }
-
-
-
 
     // 
     //     public class DrawPar
