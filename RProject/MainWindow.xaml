@@ -106,32 +106,35 @@
                     <GroupBox Header="同环比增长" Margin="0,230,0,0">
                         <Grid Margin="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="251*"/>
-                                <ColumnDefinition Width="95*"/>
-                                <ColumnDefinition Width="346*"/>
+                                <ColumnDefinition Width="0*"/>
+                                <ColumnDefinition Width="100*"/>
+                                <ColumnDefinition Width="150*"/>
+                                <ColumnDefinition Width="50*"/>
+                                <ColumnDefinition Width="200*"/>
+                                <ColumnDefinition Width="0*"/>
                             </Grid.ColumnDefinitions>
-                            <Label Content="选择奶牛ID" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="25" HorizontalAlignment="Left" Width="85"/>
-                            <ComboBox x:Name="Sigle_CowIdCbB2" Margin="100,10,10,0" VerticalAlignment="Top" Height="25" ItemsSource="{Binding Items, ElementName=Sigle_CowIdCbB}" SelectionChanged="CowIdCbB2_SelectionChanged" VerticalContentAlignment="Center"/>
-                            <Label Content="选择开始日期" Margin="10,45,0,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Left" Width="85"/>
-                            <Label Content="选择结束日期" Margin="10,80,0,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Left" Width="85"/>
-                            <Label Content="选择比较天数" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" Height="25" Width="85"/>
-                            <ComboBox x:Name="SelectCompareDaysCbB" Margin="100,115,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center">
+                            <Label Content="选择奶牛ID" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="25" Grid.Column="1"/>
+                            <ComboBox x:Name="Sigle_CowIdCbB2" Margin="10,10,10,0" VerticalAlignment="Top" Height="25" ItemsSource="{Binding Items, ElementName=Sigle_CowIdCbB}" SelectionChanged="CowIdCbB2_SelectionChanged" VerticalContentAlignment="Center" Grid.Column="2" Grid.ColumnSpan="3"/>
+                            <Label Content="选择开始日期" Margin="10,40,10,0" VerticalAlignment="Top" Height="25" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                            <Label Content="选择结束日期" Margin="10,70,10,0" VerticalAlignment="Top" Height="25" Grid.Column="1" HorizontalContentAlignment="Center"/>
+                            <Label Content="选择比较天数" Margin="10,191,10,0" VerticalAlignment="Top" Height="25" Grid.Column="1" HorizontalContentAlignment="Center"/>
+                            <ComboBox x:Name="SelectCompareDaysCbB" Margin="10,191,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" Grid.Column="2" Grid.ColumnSpan="3">
                                 <ComboBoxItem Content="3"/>
                                 <ComboBoxItem Content="4"/>
                                 <ComboBoxItem Content="5"/>
                                 <ComboBoxItem Content="6"/>
                                 <ComboBoxItem Content="7"/>
                             </ComboBox>
-                            <DatePicker x:Name="StartDateDP" Margin="100,45,10,0" VerticalAlignment="Top" Height="25" SelectedDateFormat="Long" SelectedDateChanged="StartDateDP_SelectedDateChanged" />
-                            <DatePicker x:Name="EndDateDP" Margin="100,80,10,0" VerticalAlignment="Top" Height="25" SelectedDateFormat="Long" SelectedDateChanged="EndDateDP_SelectedDateChanged" />
-                            <Button x:Name="TongbiBtn" Content="计算同比" Margin="10,10,10,0" VerticalAlignment="Top" Height="25" Grid.Column="1" Click="TongbiBtn_Click"/>
-                            <Label Content="选择阈值" HorizontalAlignment="Left" Margin="10,150,0,0" VerticalAlignment="Top" Width="85" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                            <ComboBox x:Name="Sigle_ThresholdCbB" Margin="100,150,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center">
+                            <DatePicker x:Name="StartDateDP" Margin="10,41,10,0" VerticalAlignment="Top" Height="25" SelectedDateFormat="Long" SelectedDateChanged="StartDateDP_SelectedDateChanged" Grid.Column="2" Grid.ColumnSpan="3" />
+                            <DatePicker x:Name="EndDateDP" Margin="10,71,10,0" VerticalAlignment="Top" Height="25" SelectedDateFormat="Long" SelectedDateChanged="EndDateDP_SelectedDateChanged" Grid.Column="2" Grid.ColumnSpan="3" />
+                            <Button x:Name="TongbiBtn" Content="↑↑↑↑↑计算同比↓↓↓↓↓" Margin="50,145,38,0" VerticalAlignment="Top" Height="25" Click="TongbiBtn_Click" Grid.Column="1" Grid.ColumnSpan="2"/>
+                            <Label Content="选择阈值" Margin="10,101,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="25" Grid.Column="1"/>
+                            <ComboBox x:Name="Sigle_ThresholdCbB" Margin="10,101,10,0" VerticalAlignment="Top" Height="25" VerticalContentAlignment="Center" Grid.Column="2" Grid.ColumnSpan="3">
                                 <ComboBoxItem Content="0"/>
                                 <ComboBoxItem Content="1"/>
                                 <ComboBoxItem Content="2"/>
                             </ComboBox>
-                            <Button x:Name="HuanbiBtn" Content="计算环比" Grid.Column="1" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Width="75" Height="25" Click="HuanbiBtn_Click"/>
+                            <Button x:Name="HuanbiBtn" Content="↑↑↑↑↑计算环比↑↑↑↑↑" Grid.Column="3" Margin="39,145,50,0" VerticalAlignment="Top" Height="25" Click="HuanbiBtn_Click" Grid.ColumnSpan="2"/>
                         </Grid>
                     </GroupBox>
 
