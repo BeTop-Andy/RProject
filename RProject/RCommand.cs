@@ -214,8 +214,46 @@ namespace RProject
 
             re.Evaluate(string.Format("plot(List[[1]],type=\"l\",ylim=c({0},{1}),xlim=c({2},{3}),ylab=\"value\",col=\"blue\")",yMin-1,yMax+1,xMin,xMax));
             re.Evaluate("lines(List[[2]],col=\"red\")");
-            string legendStr = "legend(\"topleft\",legend=c(\"AVG\",\"SD\"),col=c(\"blue\",\"red\"),lty=1,lwd=1,cex=1)";
+            string legendStr = "legend(\"topleft\",legend=c(\"By AVG\",\"By SD\"),col=c(\"blue\",\"red\"),lty=1,lwd=1,cex=1)";
             re.Evaluate(legendStr);
+        }
+
+        public static void LoadingHuanBiFunToR()
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+
+            string str = 
+                //RFun.txt      //环比
+@"my_func_huanbi <- function (smoothData, startIndex, endIndex) {
+              nowData <- smoothData[startIndex:endIndex];
+              preData <- NULL;
+              count <- endIndex - startIndex + 1;
+              preStartIndex <- startIndex - count;
+              preEndIndex <- startIndex - 1;
+              if (preStartIndex < 0) {
+                 preData[1:(abs(preStartIndex) + 1)] <- 0;
+                 for (i in 1:preEndIndex) {
+                     preData[abs(preStartIndex) + 1 + i] <- smoothData[i];
+                 }
+              } else {
+                for (i in 1:count) {
+                    preData[i] <- smoothData[preStartIndex+i-1];
+                }
+              }
+              result <- (nowData-preData)/preData;
+
+              return (result);
+}";
+            re.Evaluate(str);
+        }
+
+        public static void HuanBiAndDrawByR(string varName, int startIndex, int endIndex,int xMin, int xMax)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+
+            re.Evaluate(string.Format("HuanBiResult <- my_func_huanbi({0},{1},{2})",varName,startIndex,endIndex));
+
+            re.Evaluate(string.Format("plot(HuanBiResult,type=\"l\",ylab=\"value\",xlim=c({0},{1}))",xMin,xMax));
         }
     }
 

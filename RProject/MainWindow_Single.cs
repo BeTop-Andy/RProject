@@ -86,7 +86,7 @@ namespace RProject
             //                 }
             //             } else 
             string varName = null;
-            if (ReadDataToR(ref varName)) {
+            if (ReadDataToR_1(ref varName)) {
                 StatisticsByR(varName);
             }
         }
@@ -96,21 +96,13 @@ namespace RProject
         /// </summary>
         /// <param name="varName">变量名字</param>
         /// <returns>是否成功</returns>
-        private bool ReadDataToR(ref string varName)
+        private bool ReadDataToR_1(ref string varName)
         {
             int cowId = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
 
-            List<bool> condition = new List<bool> { myConn != null, Sigle_CowIdCbB.SelectedIndex != -1, ht.Contains(cowId) && ((SelectTime) ht[cowId]).isOK, Single_ThresholdCbB.SelectedIndex != -1 };
-
-            string[] msg = new string[] { "数据库连接失败", "请选择奶牛ID", "请选择时段并且确认按下了确定按钮", "请选择阈值" };
-
-
-            int index = condition.FindIndex(x => x == false);       //找不符合的
-            if (index != -1) {
-                MessageBox.Show(msg[index]);
+            if (!CheckFor_1(cowId)) {
                 return false;
             }
-
 
             SelectTime stWin = (SelectTime) ht[cowId];
             List<int> l = new List<int>();
@@ -175,6 +167,26 @@ namespace RProject
             varName = "Index";
             RCommand.LoadingDataToR(l, varName);
 
+            return true;
+        }
+
+        /// <summary>
+        /// 检查条件 For ReadDataToR_1
+        /// </summary>
+        /// <param name="cowId"></param>
+        /// <returns></returns>
+        private bool CheckFor_1(int cowId)
+        {
+            List<bool> condition = new List<bool> { myConn != null, Sigle_CowIdCbB.SelectedIndex != -1, ht.Contains(cowId) && ((SelectTime) ht[cowId]).isOK, Single_ThresholdCbB.SelectedIndex != -1 };
+
+            string[] msg = new string[] { "数据库连接失败", "请选择奶牛ID", "请选择时段并且确认按下了确定按钮", "请选择阈值" };
+
+
+            int index = condition.FindIndex(x => x == false);       //找不符合的
+            if (index != -1) {
+                MessageBox.Show(msg[index]);
+                return false;
+            }
             return true;
         }
 
@@ -381,7 +393,7 @@ namespace RProject
         private void SmoothBtn_Click(object sender, RoutedEventArgs e)
         {
             string varName = null;
-            if (ReadDataToR(ref varName)) {
+            if (ReadDataToR_1(ref varName)) {
                 RCommand.LoadingSmoothFunToR();
                 RCommand.SmoothByR(varName);
 
@@ -412,6 +424,29 @@ namespace RProject
 
         private bool ReadDataToR_2(ref string varName)
         {
+            if (!CheckFor_2or3()) {
+                return false;
+            }
+
+
+            int cowId = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
+            DateTime sd = StartDateDP.SelectedDate.Value;
+            DateTime ed = EndDateDP.SelectedDate.Value;
+            int threshold = Sigle_ThresholdCbB.SelectedIndex;
+
+            varName = "CrossValue";
+
+            CommonCodeFor2and3(varName, sd, ed, threshold);
+
+            return true;
+        }
+
+        /// <summary>
+        /// 检查条件 For ReadDataToR_(2/3)
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckFor_2or3()
+        {
             List<bool> condition = new List<bool> { myConn != null, Sigle_CowIdCbB2.SelectedIndex != -1, StartDateDP.SelectedDate != null, EndDateDP.SelectedDate != null, Sigle_ThresholdCbB.SelectedIndex != -1 };
 
             string[] msg = new string[] { "数据库连接失败", "请选择奶牛ID", "请选择开始日期", "请选择结束日期", "请选择阈值" };
@@ -426,36 +461,9 @@ namespace RProject
                 MessageBox.Show("结束日期必须在开始日期之后");
                 return false;
             }
-
-
-
-            int cowId = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
-            DateTime sd = StartDateDP.SelectedDate.Value;
-            DateTime ed = EndDateDP.SelectedDate.Value;
-            int threshold = Sigle_ThresholdCbB.SelectedIndex;
-
-            string commStr;
-            MySqlCommand mySqlComm;
-            MySqlDataReader dr;
-            List<int> l = new List<int>();
-
-            for (DateTime temp = sd; temp <= ed; temp = temp.AddDays(1)) {
-                for (int i = 1; i <= 24; i++) {
-                    commStr = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", i.ToString(), temp.ToString("yyyy-M-d"), threshold.ToString());
-                    mySqlComm = new MySqlCommand(commStr, myConn);
-                    using (dr = mySqlComm.ExecuteReader()) {
-                        while (dr.Read()) {
-                            l.Add(dr.GetInt32(0));
-                        }
-                    }
-                }
-            }
-
-            varName = "CrossValue";
-            RCommand.LoadingDataToR(l, varName);
-
             return true;
         }
+
         private void StartDateDP_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             if (EndDateDP.SelectedDate != null) {
@@ -499,9 +507,62 @@ namespace RProject
             }
         }
 
+        private bool ReadDataToR_3(ref string varName)
+        {
+            if (!CheckFor_2or3()) {
+                return false;
+            }
+
+            int cowId = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
+            DateTime sd = StartDateDP.DisplayDateStart.Value;
+            DateTime ed = EndDateDP.DisplayDateEnd.Value;
+            int threshold = Sigle_ThresholdCbB.SelectedIndex;
+            varName = "HuanBiValue";
+
+            CommonCodeFor2and3(varName, sd, ed, threshold);
+
+            return true;
+        }
+
+        private void CommonCodeFor2and3(string varName, DateTime sd, DateTime ed, int threshold)
+        {
+            string commStr;
+            MySqlCommand mySqlComm;
+            MySqlDataReader dr;
+            List<int> l = new List<int>();
+
+            for (DateTime temp = sd; temp <= ed; temp = temp.AddDays(1)) {
+                for (int i = 1; i <= 24; i++) {
+                    commStr = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", i.ToString(), temp.ToString("yyyy-M-d"), threshold.ToString());
+                    mySqlComm = new MySqlCommand(commStr, myConn);
+                    using (dr = mySqlComm.ExecuteReader()) {
+                        while (dr.Read()) {
+                            l.Add(dr.GetInt32(0));
+                        }
+                    }
+                }
+            }
+            RCommand.LoadingDataToR(l, varName);
+        }
+
+
         private void HuanbiBtn_Click(object sender, RoutedEventArgs e)
         {
+            string varName = null;
 
+            if (ReadDataToR_3(ref varName)) {
+                DateTime st = StartDateDP.SelectedDate.Value;
+                DateTime ed = EndDateDP.SelectedDate.Value;
+                int startIndex = (st - StartDateDP.DisplayDateStart.Value).Days * 24 + 1;   //*24得到有多少个小时
+                int endIndex = (ed - StartDateDP.DisplayDateStart.Value).Days * 24;
+                int xmin = (int) StartSlider.Value;
+                int xmax = (int) EndSlider.Value;
+
+                RCommand.LoadingSmoothFunToR();
+                RCommand.LoadingHuanBiFunToR();
+                RCommand.SmoothByR(varName);
+                RCommand.HuanBiAndDrawByR(varName, startIndex, endIndex, xmin, xmax);
+            }
         }
     }
 
