@@ -50,6 +50,10 @@ namespace RProject
             using (MySqlDataReader dr = comm.ExecuteReader()) {
                 while (dr.Read()) {
                     Sigle_CowIdCbB.Items.Add(dr.GetString(0));
+                    string CowId = dr.GetString(0);
+                    CowListItem cli = new CowListItem(Convert.ToInt32(CowId));
+                    Double_CowIdLV.Items.Add(cli);
+                    
                 }
             }
         }
@@ -250,6 +254,8 @@ namespace RProject
 
 
 
+
+
         
 
 
@@ -271,5 +277,15 @@ namespace RProject
 
 
 
+    }
+
+    class CowListItem
+    {
+        public int CowId { get; set; }
+
+        public CowListItem(int id)
+        {
+            CowId = id;
+        }
     }
 }

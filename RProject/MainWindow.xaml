@@ -3,6 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="RProject.MainWindow"
         Title="R-Project" Height="600" Width="800" MinWidth="800" MinHeight="600" Icon="Image/RIcon40_3.png" Closing="Window_Closing">
+    <Window.Resources>
+        <DataTemplate x:Key="IsSelectedDT">
+            <CheckBox x:Name="IsSelectedCB" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        </DataTemplate>
+        <DataTemplate x:Key="CowIdDT">
+            <Label x:Name="CowIdL" Content="{Binding Path=CowId}" />
+        </DataTemplate>
+        <DataTemplate x:Key="SelectTimeDT">
+            <Button x:Name="SelectTimeB" Content="选择时间段" Click="SelectTimeB_Click"/>
+        </DataTemplate>
+        <DataTemplate x:Key="ThresholdDT">
+            <ComboBox x:Name="ThresholdCbB">
+                <ComboBoxItem Content="0"/>
+                <ComboBoxItem Content="1"/>
+                <ComboBoxItem Content="2"/>
+            </ComboBox>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -157,7 +175,19 @@
                 </Grid>
             </TabItem>
             <TabItem Header="两头奶牛" Height="30" Margin="0,-41,0,41">
-                <Grid />
+                <Grid >
+                    <ListView x:Name="Double_CowIdLV" Width="250" Margin="10,10,0,10" HorizontalAlignment="Left" >
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="选择？" Width="50"  CellTemplate="{StaticResource IsSelectedDT}"/>
+                                <GridViewColumn Header="奶牛ID" Width="50" DisplayMemberBinding="{Binding CowId}"/>
+                                <GridViewColumn Header="选择时间段" Width="75" CellTemplate="{StaticResource SelectTimeDT}"/>
+                                <GridViewColumn Header="阈值" Width="50" CellTemplate="{StaticResource ThresholdDT}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                </Grid>
             </TabItem>
         </TabControl>
 
