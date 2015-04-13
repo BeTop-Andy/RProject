@@ -64,6 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MainWindow_Double.cs" />
     <Compile Include="RCommand.cs" />
     <Compile Include="SelectTime.xaml.cs">
       <DependentUpon>SelectTime.xaml</DependentUpon>

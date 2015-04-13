@@ -225,24 +225,36 @@ namespace RProject
             string str = 
                 //RFun.txt      //环比
 @"my_func_huanbi <- function (smoothData, startIndex, endIndex) {
-              nowData <- smoothData[startIndex:endIndex];
-              preData <- NULL;
-              count <- endIndex - startIndex + 1;
-              preStartIndex <- startIndex - count;
-              preEndIndex <- startIndex - 1;
-              if (preStartIndex < 0) {
-                 preData[1:(abs(preStartIndex) + 1)] <- 0;
-                 for (i in 1:preEndIndex) {
-                     preData[abs(preStartIndex) + 1 + i] <- smoothData[i];
-                 }
-              } else {
-                for (i in 1:count) {
-                    preData[i] <- smoothData[preStartIndex+i-1];
-                }
-              }
-              result <- (nowData-preData)/preData;
+	nowData <- smoothData[startIndex:endIndex];
+	preData <- NULL;
+    count <- endIndex - startIndex + 1;
+    preStartIndex <- startIndex - count;
+    preEndIndex <- startIndex - 1;
 
-              return (result);
+    if (startIndex != 1) {
+		if (preStartIndex < 0) {
+			preData[1:(abs(preStartIndex) + 1)] <- 0;
+			for (i in 1:preEndIndex) {
+				preData[abs(preStartIndex) + 1 + i] <- smoothData[i];
+			}
+		} else {
+			for (i in 1:count) {
+				preData[i] <- smoothData[preStartIndex+i-1];
+			}
+		}
+	} else {
+		preData[1:count] <- 0;
+	}
+	result <- NULL;
+	for (i in 1:count) {
+		if (preData[i] == 0) {
+			result[i] <- 0;
+		} else {
+			result[i] <- (nowData[i]-preData[i])/preData[i];
+		}
+	}
+
+	return (result);
 }";
             re.Evaluate(str);
         }

@@ -85,8 +85,8 @@ namespace RProject
             // 
             //                 }
             //             } else 
-            string varName = null;
-            if (ReadDataToR_1(ref varName)) {
+            string varName;
+            if (ReadDataToR_1(out varName)) {
                 StatisticsByR(varName);
             }
         }
@@ -96,11 +96,12 @@ namespace RProject
         /// </summary>
         /// <param name="varName">变量名字</param>
         /// <returns>是否成功</returns>
-        private bool ReadDataToR_1(ref string varName)
+        private bool ReadDataToR_1(out string varName)
         {
             int cowId = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
 
             if (!CheckFor_1(cowId)) {
+                varName = "";
                 return false;
             }
 
@@ -392,8 +393,8 @@ namespace RProject
 
         private void SmoothBtn_Click(object sender, RoutedEventArgs e)
         {
-            string varName = null;
-            if (ReadDataToR_1(ref varName)) {
+            string varName;
+            if (ReadDataToR_1(out varName)) {
                 RCommand.LoadingSmoothFunToR();
                 RCommand.SmoothByR(varName);
 
@@ -422,9 +423,10 @@ namespace RProject
             }
         }
 
-        private bool ReadDataToR_2(ref string varName)
+        private bool ReadDataToR_2(out string varName)
         {
             if (!CheckFor_2or3()) {
+                varName = "";
                 return false;
             }
 
@@ -486,7 +488,7 @@ namespace RProject
 
         private void TongbiBtn_Click(object sender, RoutedEventArgs e)
         {
-            string varName = null;
+            string varName;
             int compareDays;
 
             if (SelectCompareDaysCbB.SelectedIndex != -1) {
@@ -496,7 +498,7 @@ namespace RProject
                 return;
             }
 
-            if (ReadDataToR_2(ref varName)) {
+            if (ReadDataToR_2(out varName)) {
                 int totalDays = (EndDateDP.SelectedDate.Value - StartDateDP.SelectedDate.Value).Days;
                 int xMin = (int) StartSlider.Value;
                 int xMax = (int) EndSlider.Value;

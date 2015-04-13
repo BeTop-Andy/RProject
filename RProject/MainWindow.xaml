@@ -140,7 +140,7 @@
 
                 </Grid>
             </TabItem>
-            <TabItem Header="设置" Height="30" VerticalAlignment="Top" Margin="0,20,0,-20">
+            <TabItem Header="设置" Height="30" VerticalAlignment="Top" Margin="0,145,0,-145">
                 <Grid>
                     <Label Content="每一页的行数（默认3600）" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="160" Margin="10,10,0,0" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="RowPerPageTB" HorizontalAlignment="Left" Height="25" Margin="175,10,0,0" TextWrapping="Wrap" Text="3600" VerticalAlignment="Top" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
@@ -148,13 +148,16 @@
                     <Button x:Name="DefaultBtn" Content="重置" HorizontalAlignment="Right" Margin="0,0,90,10" VerticalAlignment="Bottom" Width="75" Height="30"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="单头奶牛" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="62" Margin="0,69,0,-69">
+            <TabItem Header="单头奶牛" Height="30" VerticalAlignment="Top" Margin="0,69,0,-69">
                 <Grid >
                     <Label Content="选择奶牛ID" Margin="10,10,621,0" VerticalAlignment="Top"/>
                     <TextBox x:Name="ResultTextBox" Margin="10,60,101,357" TextWrapping="Wrap" Text="等待选择文件" VerticalContentAlignment="Center" IsEnabled="False"/>
                     <Button x:Name="ReadBtn" Content="打开" Margin="625,60,10,357" Click="ReadBtn_Click" IsEnabled="False"/>
                     <ProgressBar x:Name="LoadingBar" IsIndeterminate="True" Visibility="Hidden" FlowDirection="LeftToRight" Grid.IsSharedSizeScope="True" Margin="299,157,10,0"/>
                 </Grid>
+            </TabItem>
+            <TabItem Header="两头奶牛" Height="30" Margin="0,-41,0,41">
+                <Grid />
             </TabItem>
         </TabControl>
 

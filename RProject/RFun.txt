@@ -66,19 +66,30 @@ my_func_huanbi <- function (smoothData, startIndex, endIndex) {
 	#ｘｘｘｘ结束ｘｘ
     preEndIndex <- startIndex - 1;
 
-	#当数据长度比（startIndex-0）长时
-    if (preStartIndex < 0) {
-		#少数据的地方置0
-		preData[1:(abs(preStartIndex) + 1)] <- 0;	
-        for (i in 1:preEndIndex) {
-			preData[abs(preStartIndex) + 1 + i] <- smoothData[i];
-        }
+    if (startIndex != 1) {
+		#当数据长度比（startIndex-0）长时
+		if (preStartIndex < 0) {
+			#少数据的地方置0
+			preData[1:(abs(preStartIndex) + 1)] <- 0;
+			for (i in 1:preEndIndex) {
+				preData[abs(preStartIndex) + 1 + i] <- smoothData[i];
+			}
+		} else {
+			for (i in 1:count) {
+				preData[i] <- smoothData[preStartIndex+i-1];
+			}
+		}
 	} else {
-		for (i in 1:count) {
-			preData[i] <- smoothData[preStartIndex+i-1];
+		preData[1:count] <- 0;
+	}
+	result <- NULL;
+	for (i in 1:count) {
+		if (preData[i] == 0) {
+			result[i] <- 0;
+		} else {
+			result[i] <- (nowData[i]-preData[i])/preData[i];
 		}
 	}
-	result <- (nowData-preData)/preData;
 
 	return (result);
 }
