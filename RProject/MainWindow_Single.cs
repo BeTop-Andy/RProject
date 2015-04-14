@@ -146,7 +146,7 @@ namespace RProject
                         startIndex = 1;
                     }
                     for (; startIndex <= endIndex; startIndex++) {
-                        sqlComm = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", startIndex, tempDate.ToString("yyyy-M-d"), Single_ThresholdCbB.SelectedIndex);
+                        sqlComm = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2} and cowId = {3}", startIndex, tempDate.ToString("yyyy-M-d"), Single_ThresholdCbB.SelectedIndex, cowId);
                         comm = new MySqlCommand(sqlComm, myConn);
 
                         using (dr = comm.ExecuteReader()) {
@@ -361,32 +361,37 @@ namespace RProject
         {
             if (myConn != null && Sigle_CowIdCbB.SelectedIndex != -1) {
                 int id = Convert.ToInt32(Sigle_CowIdCbB.SelectedValue);
-                string commText = "select min(date),max(date) from `data` where cowId = " + id;
-
-                MySqlCommand comm = new MySqlCommand(commText, myConn);
-                using (MySqlDataReader dr = comm.ExecuteReader()) {
-                    DateTime sd;            //StartDate
-                    DateTime ed;            //EndDate
-
-                    if (dr.Read()) {
-                        sd = dr.GetDateTime(0);
-                        ed = dr.GetDateTime(1);
-
-                        SelectTime stWin;
-
-                        if (ht.Contains(id)) {
-                            stWin = (SelectTime) ht[id];
-                        } else {
-                            stWin = new SelectTime(sd, ed);
-                            ht.Add(id, stWin);
-                        }
-
-                        stWin.isOK = false;
-                        stWin.ShowDialog();
-                    }
-                }
+                ShowSelectTimeWindow(id);
             } else {
                 MessageBox.Show("请选择奶牛ID");
+            }
+        }
+
+        private void ShowSelectTimeWindow(int id)
+        {
+            string commText = "select min(date),max(date) from `data` where cowId = " + id;
+
+            MySqlCommand comm = new MySqlCommand(commText, myConn);
+            using (MySqlDataReader dr = comm.ExecuteReader()) {
+                DateTime sd;            //StartDate
+                DateTime ed;            //EndDate
+
+                if (dr.Read()) {
+                    sd = dr.GetDateTime(0);
+                    ed = dr.GetDateTime(1);
+
+                    SelectTime stWin;
+
+                    if (ht.Contains(id)) {
+                        stWin = (SelectTime) ht[id];
+                    } else {
+                        stWin = new SelectTime(sd, ed);
+                        ht.Add(id, stWin);
+                    }
+
+                    stWin.isOK = false;
+                    stWin.ShowDialog();
+                }
             }
         }
 
@@ -468,7 +473,7 @@ namespace RProject
 
         private void StartDateDP_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (EndDateDP.SelectedDate != null) {
+            if (StartDateDP.SelectedDate != null && EndDateDP.SelectedDate != null) {
                 int daysLength = (EndDateDP.SelectedDate.Value - StartDateDP.SelectedDate.Value).Days;
                 StartSlider.Maximum = daysLength * 24;
                 EndSlider.Maximum = daysLength * 24;
@@ -478,7 +483,7 @@ namespace RProject
 
         private void EndDateDP_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (StartDateDP.SelectedDate != null) {
+            if (EndDateDP.SelectedDate != null && StartDateDP.SelectedDate != null) {
                 int daysLength = (EndDateDP.SelectedDate.Value - StartDateDP.SelectedDate.Value).Days;
                 StartSlider.Maximum = daysLength * 24;
                 EndSlider.Maximum = daysLength * 24;
@@ -528,6 +533,7 @@ namespace RProject
 
         private void CommonCodeFor2and3(string varName, DateTime sd, DateTime ed, int threshold)
         {
+            int cowId = Convert.ToInt32(Sigle_CowIdCbB2.SelectedValue);
             string commStr;
             MySqlCommand mySqlComm;
             MySqlDataReader dr;
@@ -535,7 +541,7 @@ namespace RProject
 
             for (DateTime temp = sd; temp <= ed; temp = temp.AddDays(1)) {
                 for (int i = 1; i <= 24; i++) {
-                    commStr = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2}", i.ToString(), temp.ToString("yyyy-M-d"), threshold.ToString());
+                    commStr = string.Format("select value{0} from `data` where date = date('{1}') and threshold = {2} and cowId = {3}", i.ToString(), temp.ToString("yyyy-M-d"), threshold.ToString(), cowId);
                     mySqlComm = new MySqlCommand(commStr, myConn);
                     using (dr = mySqlComm.ExecuteReader()) {
                         while (dr.Read()) {

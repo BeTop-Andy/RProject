@@ -93,3 +93,19 @@ my_func_huanbi <- function (smoothData, startIndex, endIndex) {
 
 	return (result);
 }
+
+
+#----------------------------------
+#找极大值下标
+my_func_extremum <- function(Data) {
+    result <- NULL;
+    count <- length(Data);
+    for (i in 2:(count-1)) {
+        if (Data[i] > Data[i-1] && Data[i] >= Data[i+1]) {
+            result <- c(result, i);
+        } else if (Data[i] > Data[i+1] && Data[i] >= Data[i-1]) {
+            result <- c(result,i);
+        }
+    }
+    return (result);
+}

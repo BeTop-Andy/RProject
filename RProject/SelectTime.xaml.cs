@@ -99,7 +99,7 @@ namespace RProject
             int index = TimeDG.SelectedIndex;
 
             if (index > -1) {
-                MessageBoxResult r = MessageBox.Show("将要删除ID-" + index, "警告", MessageBoxButton.OKCancel);
+                MessageBoxResult r = MessageBox.Show("将要删除ID-" + (index+1), "警告", MessageBoxButton.OKCancel);
                 if (r == MessageBoxResult.OK) {
                     dt.Rows.RemoveAt(index);
                 }
@@ -130,8 +130,12 @@ namespace RProject
 
         private void YesBtn_Click(object sender, RoutedEventArgs e)
         {
-            isOK = true;
-            this.Hide();
+            if (dt.Rows.Count != 0) {
+                isOK = true;
+                this.Hide();
+            } else {
+                MessageBox.Show("请至少选择一段时间");
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

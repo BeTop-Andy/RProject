@@ -36,7 +36,11 @@ namespace RProject
         {
             REngine re = REngine.GetInstanceFromID("R");
             return Math.Round(re.Evaluate("mean(" + varName + ")").AsNumeric()[0], 2);
-
+        }
+        public static double Avg(string varName1, string varName2)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            return Math.Round(re.Evaluate("mean(c(" + varName1 + "," + varName2 + "))").AsNumeric()[0], 2);
         }
 
         /// <summary>
@@ -49,6 +53,11 @@ namespace RProject
             REngine re = REngine.GetInstanceFromID("R");
             return Math.Round(re.Evaluate("var(" + varName + ")").AsNumeric()[0], 2);
         }
+        public static double Var(string varName1, string varName2)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            return Math.Round(re.Evaluate("var(c(" + varName1 + "," + varName2 + "))").AsNumeric()[0], 2);
+        }
 
         /// <summary>
         /// 用R求最大值
@@ -59,6 +68,11 @@ namespace RProject
         {
             REngine re = REngine.GetInstanceFromID("R");
             return re.Evaluate("max(" + varName + ")").AsInteger()[0];
+        }
+        public static int Max(string varName1, string varName2)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            return re.Evaluate("max(c(" + varName1 + "," + varName2 + "))").AsInteger()[0];
         }
 
         /// <summary>
@@ -71,6 +85,11 @@ namespace RProject
             REngine re = REngine.GetInstanceFromID("R");
             return re.Evaluate("min(" + varName + ")").AsInteger()[0];
         }
+        public static int Min(string varName1, string varName2)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            return re.Evaluate("min(c(" + varName1 + "," + varName2 + "))").AsInteger()[0];
+        }
 
         /// <summary>
         /// 用R求中位数
@@ -82,6 +101,11 @@ namespace RProject
             REngine re = REngine.GetInstanceFromID("R");
             return re.Evaluate("median(" + varName + ")").AsInteger()[0];
         }
+        public static int Median(string varName1, string varName2)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            return re.Evaluate("median(c(" + varName1 + "," + varName2 + "))").AsInteger()[0];
+        }
 
         /// <summary>
         /// 用R求众数
@@ -92,6 +116,11 @@ namespace RProject
         {
             REngine re = REngine.GetInstanceFromID("R");
             return Convert.ToInt32(re.Evaluate("names(which.max(table(" + varName + ")))").AsCharacter()[0]);
+        }
+        public static int Mode(string varName1, string varName2)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            return Convert.ToInt32(re.Evaluate("names(which.max(table(c(" + varName1 + "," + varName2 + "))))").AsCharacter()[0]);
         }
 
         public static void LoadingSmoothFunToR()
@@ -157,12 +186,32 @@ namespace RProject
             }
         }
 
+        public static void DrawByR_D(string varName1, string varName2, int startIndex, int endIndex)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            NumericVector nv1 = re.Evaluate(varName1).AsNumeric();
+            NumericVector nv2 = re.Evaluate(varName2).AsNumeric();
+            int ymax = (int) nv1.Max();
+            int ymin = (int) nv2.Min();
+            if (ymax < nv2.Max()) {
+                ymax = (int) nv2.Max() + 1;
+            }
+            if (ymin > nv2.Min()) {
+                ymin = (int) nv2.Min() - 1;
+            }
+
+
+            re.Evaluate(string.Format("plot(" + varName1 + ",type=\"l\",ylab=\"value\",xlim=c({0},{1}),col=1,ylim=c({2},{3}))", startIndex, endIndex, ymin, ymax));
+            re.Evaluate("lines(" + varName2 + ",col=2)");
+            re.Evaluate("legend(\"topleft\",legend=c(\"" + varName1 + "\",\"" + varName2 + "\"),col=c(1,2),lty=1,lwd=1,cex=1)");
+        }
+
         public static void LoadingCrossFunToR()
         {
             REngine re = REngine.GetInstanceFromID("R");
 
             //RFun.txt      //同比
-            string tongbiString = 
+            string tongbiString =
 @"my_func_cross <- function(my_smooth_data, total_days, compare_dates){
   my_cross_mean <- vector(length = 0);
   my_cross_sd <- vector(length = 0);
@@ -212,7 +261,7 @@ namespace RProject
                 yMin = gv[1].AsNumeric().Min();
             }
 
-            re.Evaluate(string.Format("plot(List[[1]],type=\"l\",ylim=c({0},{1}),xlim=c({2},{3}),ylab=\"value\",col=\"blue\")",yMin-1,yMax+1,xMin,xMax));
+            re.Evaluate(string.Format("plot(List[[1]],type=\"l\",ylim=c({0},{1}),xlim=c({2},{3}),ylab=\"value\",col=\"blue\")", yMin - 1, yMax + 1, xMin, xMax));
             re.Evaluate("lines(List[[2]],col=\"red\")");
             string legendStr = "legend(\"topleft\",legend=c(\"By AVG\",\"By SD\"),col=c(\"blue\",\"red\"),lty=1,lwd=1,cex=1)";
             re.Evaluate(legendStr);
@@ -222,7 +271,7 @@ namespace RProject
         {
             REngine re = REngine.GetInstanceFromID("R");
 
-            string str = 
+            string str =
                 //RFun.txt      //环比
 @"my_func_huanbi <- function (smoothData, startIndex, endIndex) {
 	nowData <- smoothData[startIndex:endIndex];
@@ -259,13 +308,126 @@ namespace RProject
             re.Evaluate(str);
         }
 
-        public static void HuanBiAndDrawByR(string varName, int startIndex, int endIndex,int xMin, int xMax)
+        public static void HuanBiAndDrawByR(string varName, int startIndex, int endIndex, int xMin, int xMax)
         {
             REngine re = REngine.GetInstanceFromID("R");
 
-            re.Evaluate(string.Format("HuanBiResult <- my_func_huanbi({0},{1},{2})",varName,startIndex,endIndex));
+            re.Evaluate(string.Format("HuanBiResult <- my_func_huanbi({0},{1},{2})", varName, startIndex, endIndex));
 
-            re.Evaluate(string.Format("plot(HuanBiResult,type=\"l\",ylab=\"value\",xlim=c({0},{1}))",xMin,xMax));
+            re.Evaluate(string.Format("plot(HuanBiResult,type=\"l\",ylab=\"value\",xlim=c({0},{1}))", xMin, xMax));
+        }
+
+        public static void LoadingExtremumFunToR()
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+
+            string commStr =
+                //RFun.txt      //找极大值下标  
+@"my_func_extremum <- function(Data) {
+    result <- NULL;
+    count <- length(Data);
+    for (i in 2:(count-1)) {
+        if (Data[i] > Data[i-1] && Data[i] >= Data[i+1]) {
+            result <- c(result, i);
+        } else if (Data[i] > Data[i+1] && Data[i] >= Data[i-1]) {
+            result <- c(result,i);
+        }
+    }
+    return (result);
+}";
+
+            re.Evaluate(commStr);
+        }
+
+        public static List<int> GetExtremumIndexFromR(string varName)
+        {
+            List<int> l = new List<int>();
+            REngine re = REngine.GetInstanceFromID("R");
+            LoadingExtremumFunToR();
+            l = re.Evaluate("my_func_extremum(" + varName + ")").AsInteger().ToList<int>();
+            return l;
+        }
+
+        public static string Align(string varName1, string varName2, int index1, int index2)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            int diff = 0;
+            string temp = "temp";
+            if (index2 > index1) {
+                diff = index2 - index1;
+                temp = "T" + varName1;
+                re.Evaluate(temp + " <- " + varName1);
+            } else if (index2 < index1) {
+                diff = index1 - index2;
+                temp = "T" + varName2;
+                re.Evaluate(temp + " <- " + varName2);
+            } else {
+
+            }
+            for (int i = 0; i < diff; i++) {
+                re.Evaluate(temp + " <- c(0," + temp + ")");
+            }
+            return temp;
+        }
+
+        public static void CrossAndDrawByR(string varName1, string varName2, int total_days1, int total_days2, int compare_dates, int xMin, int xMax)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+
+            GenericVector gv1 = re.Evaluate(string.Format("List1 <- my_func_cross({0},{1},{2})", varName1, total_days1, compare_dates)).AsList();
+            double yMax1 = gv1[0].AsNumeric().Max();
+            if (gv1[0].AsNumeric().Max() < gv1[1].AsNumeric().Max()) {
+                yMax1 = gv1[1].AsNumeric().Max();
+            }
+            double yMin1 = gv1[0].AsNumeric().Min();
+            if (gv1[0].AsNumeric().Min() > gv1[1].AsNumeric().Min()) {
+                yMin1 = gv1[1].AsNumeric().Min();
+            }
+            GenericVector gv2 = re.Evaluate(string.Format("List2 <- my_func_cross({0},{1},{2})", varName2, total_days2, compare_dates)).AsList();
+            double yMax2 = gv1[1].AsNumeric().Max();
+            if (gv2[0].AsNumeric().Max() < gv2[1].AsNumeric().Max()) {
+                yMax2 = gv1[1].AsNumeric().Max();
+            }
+            double yMin2 = gv2[0].AsNumeric().Min();
+            if (gv2[0].AsNumeric().Min() > gv2[1].AsNumeric().Min()) {
+                yMin2 = gv1[1].AsNumeric().Min();
+            }
+            double yMax = yMax1;
+            double yMin = yMin1;
+            if (yMax1 < yMax2) {
+                yMax = yMax2;
+            }
+            if (yMin1 > yMin2) {
+                yMin = yMin2;
+            }
+
+            re.Evaluate(string.Format("plot(List1[[1]],type=\"l\",ylim=c({0},{1}),xlim=c({2},{3}),ylab=\"value\",col=\"blue\",lty=1)", yMin - 1, yMax + 1, xMin, xMax));
+            re.Evaluate("lines(List1[[2]],col=\"blue\",lty=2)");
+            re.Evaluate("lines(List2[[1]],col=\"red\",lty=1)");
+            re.Evaluate("lines(List2[[2]],col=\"red\",lty=2)");
+            string legendStr = "legend(\"topleft\",legend=c(\"" + varName1 + " By AVG\",\"" + varName1 + " By SD\",\"" + varName2 + " By AVG\",\"" + varName2 + " By SD\"),col=c(\"blue\",\"blue\",\"red\",\"red\"),lty=c(1,2,1,2),lwd=1,cex=1)";
+            re.Evaluate(legendStr);
+        }
+
+        public static void HuanBiAndDrawByR(string varName1, string varName2, int startIndex1, int endIndex1, int startIndex2,int endIndex2, int xMin, int xMax)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+
+            NumericVector nv1 = re.Evaluate(string.Format("HuanBiResult1 <- my_func_huanbi({0},{1},{2})", varName1, startIndex1, endIndex1)).AsNumeric();
+
+            NumericVector nv2 = re.Evaluate(string.Format("HuanBiResult2 <- my_func_huanbi({0},{1},{2})", varName2, startIndex2, endIndex2)).AsNumeric();
+            double ymax = nv1.Max();
+            if (ymax < nv2.Max()) {
+                ymax = nv2.Max();
+            }
+            double ymin = nv1.Min();
+            if (ymin > nv2.Min()) {
+                ymin = nv2.Min();
+            }
+
+            re.Evaluate(string.Format("plot(HuanBiResult1,type=\"l\",ylab=\"value\",xlim=c({0},{1}),ylim=c({2},{3}),col=\"blue\")", xMin, xMax,ymin,ymax));
+            re.Evaluate("lines(HuanBiResult2,col=\"red\")");
+            re.Evaluate("legend(\"topleft\",legend=c(\"" + varName1 + "\",\"" + varName2 + "\"),col=c(\"blue\",\"red\"),lty=1,lwd=1,cex=1)");
         }
     }
 

@@ -5,7 +5,7 @@
         Title="R-Project" Height="600" Width="800" MinWidth="800" MinHeight="600" Icon="Image/RIcon40_3.png" Closing="Window_Closing">
     <Window.Resources>
         <DataTemplate x:Key="IsSelectedDT">
-            <CheckBox x:Name="IsSelectedCB" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <CheckBox x:Name="IsSelectedCB" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Checked="IsSelectedCB_Checked" Unchecked="IsSelectedCB_Unchecked"/>
         </DataTemplate>
         <DataTemplate x:Key="CowIdDT">
             <Label x:Name="CowIdL" Content="{Binding Path=CowId}" />
@@ -14,7 +14,7 @@
             <Button x:Name="SelectTimeB" Content="选择时间段" Click="SelectTimeB_Click"/>
         </DataTemplate>
         <DataTemplate x:Key="ThresholdDT">
-            <ComboBox x:Name="ThresholdCbB">
+            <ComboBox x:Name="ThresholdCbB" SelectionChanged="ThresholdCbB_SelectionChanged">
                 <ComboBoxItem Content="0"/>
                 <ComboBoxItem Content="1"/>
                 <ComboBoxItem Content="2"/>
@@ -163,7 +163,6 @@
                     <Label Content="每一页的行数（默认3600）" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="160" Margin="10,10,0,0" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="RowPerPageTB" HorizontalAlignment="Left" Height="25" Margin="175,10,0,0" TextWrapping="Wrap" Text="3600" VerticalAlignment="Top" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                     <Button x:Name="ApplyBtn" Content="应用" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="30" Width="75" Click="ApplyBtn_Click"/>
-                    <Button x:Name="DefaultBtn" Content="重置" HorizontalAlignment="Right" Margin="0,0,90,10" VerticalAlignment="Bottom" Width="75" Height="30"/>
                 </Grid>
             </TabItem>
             <TabItem Header="单头奶牛" Height="30" VerticalAlignment="Top" Margin="0,69,0,-69">
@@ -176,16 +175,75 @@
             </TabItem>
             <TabItem Header="两头奶牛" Height="30" Margin="0,-41,0,41">
                 <Grid >
-                    <ListView x:Name="Double_CowIdLV" Width="250" Margin="10,10,0,10" HorizontalAlignment="Left" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <ListView x:Name="Double_CowIdLV" Margin="10,10,429,10" >
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="选择？" Width="50"  CellTemplate="{StaticResource IsSelectedDT}"/>
-                                <GridViewColumn Header="奶牛ID" Width="50" DisplayMemberBinding="{Binding CowId}"/>
+                                <GridViewColumn Header="奶牛ID" Width="50" CellTemplate="{StaticResource CowIdDT}"/>
                                 <GridViewColumn Header="选择时间段" Width="75" CellTemplate="{StaticResource SelectTimeDT}"/>
                                 <GridViewColumn Header="阈值" Width="50" CellTemplate="{StaticResource ThresholdDT}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
+                    <Button x:Name="DStatisticsBtn" Content="统计→" Margin="0,10,340,0" VerticalAlignment="Top" Height="25" HorizontalContentAlignment="Center" Click="DStatisticsBtn_Click" HorizontalAlignment="Right" Width="84"/>
+                    <Button x:Name="DSmoothBtn" Content="平滑后统计→" Margin="0,40,340,0" VerticalAlignment="Top" Height="25" HorizontalContentAlignment="Center" Click="DSmoothBtn_Click" HorizontalAlignment="Right" Width="84"/>
+                    <Button x:Name="DDrawBtn" Content="画折线图↓" Margin="0,70,340,0" VerticalAlignment="Top" Height="25" Click="DDrawBtn_Click" HorizontalAlignment="Right" Width="84"/>
+                    <Label Content="平均值：" HorizontalAlignment="Right" Margin="0,10,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="DAVGL" Content="未知" HorizontalAlignment="Right" Margin="0,10,180,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="方　差：" HorizontalAlignment="Right" Margin="0,10,90,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="DSD2L" Content="未知" Margin="0,9,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75"/>
+                    <Label Content="最大值：" HorizontalAlignment="Right" Margin="0,40,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="DMaxL" Content="未知" HorizontalAlignment="Right" Margin="0,40,180,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="最小值：" HorizontalAlignment="Right" Margin="0,39,90,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="DMinL" Content="未知" Margin="0,39,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75"/>
+                    <Label Content="中位数：" HorizontalAlignment="Right" Margin="0,70,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="DMedianL" Content="未知" HorizontalAlignment="Right" Margin="0,70,180,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="众　数：" HorizontalAlignment="Right" Margin="0,70,90,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="DModeL" Content="未知" Margin="0,70,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75"/>
+
+                    <Slider x:Name="DStartSlider" Margin="0,100,170,0" VerticalAlignment="Top" Height="25" IsSnapToTickEnabled="True" TickPlacement="BottomRight" LargeChange="10" HorizontalAlignment="Right" Width="254"/>
+                    <Label Content="起始下标" HorizontalAlignment="Right" Margin="0,100,90,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="{Binding Value, ElementName=DStartSlider}" HorizontalAlignment="Right" Margin="0,100,10,0" VerticalAlignment="Top" Width="75"/>
+                    <Slider x:Name="DEndSlider" Margin="0,130,170,0" VerticalAlignment="Top" Height="25" IsSnapToTickEnabled="True" TickPlacement="BottomRight" LargeChange="10" HorizontalAlignment="Right" Width="254"/>
+                    <Label Content="结束下标" HorizontalAlignment="Right" Margin="0,130,90,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="{Binding Value, ElementName=DEndSlider}" HorizontalAlignment="Right" Margin="0,130,10,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="峰值对齐操作" HorizontalAlignment="Right" Margin="0,160,340,0" VerticalAlignment="Top" Width="84"/>
+                    <Button x:Name="DefaultBtn" Content="默认" HorizontalAlignment="Right" Margin="0,160,260,0" VerticalAlignment="Top" Width="75" Height="25" Click="DefaultBtn_Click"/>
+                    <Label Content="↙选择对齐下标↘" Margin="0,160,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="244"/>
+                    <ComboBox x:Name="ExtremumCbB1" Margin="0,190,180,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="75" VerticalContentAlignment="Center"/>
+                    <Label x:Name="Cow1L" Content="奶牛1" HorizontalAlignment="Right" Margin="0,190,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="Cow2L" Content="奶牛2" HorizontalAlignment="Right" Margin="0,190,10,0" VerticalAlignment="Top" Width="75"/>
+                    <ComboBox x:Name="ExtremumCbB2" HorizontalAlignment="Right" Margin="0,190,90,0" VerticalAlignment="Top" Width="75" Height="25" VerticalContentAlignment="Center"/>
+                    <Button x:Name="AlignBtn" Content="对齐" Margin="0,190,340,0" VerticalAlignment="Top" Height="25" Click="AlignBtn_Click" HorizontalAlignment="Right" Width="84"/>
+                    <Rectangle Fill="#FFF4F4F5" Height="1" Margin="0,220,10,0" Stroke="Black" VerticalAlignment="Top" HorizontalAlignment="Right" Width="414"/>
+                    <ComboBox x:Name="DCompareDaysCbB" HorizontalAlignment="Right" Margin="0,346,90,0" VerticalAlignment="Top" Width="164" Height="25" VerticalContentAlignment="Center">
+                        <ComboBoxItem Content="3"/>
+                        <ComboBoxItem Content="4"/>
+                        <ComboBoxItem Content="5"/>
+                        <ComboBoxItem Content="6"/>
+                        <ComboBoxItem Content="7"/>
+                    </ComboBox>
+                    <Label Content="选择比较天数（仅同比）" HorizontalAlignment="Right" Margin="0,346,259,0" VerticalAlignment="Top" Width="165" HorizontalContentAlignment="Right"/>
+                    <Button x:Name="DTongBiBtn" Content="计算同比" HorizontalAlignment="Right" Margin="0,226,340,0" VerticalAlignment="Top" Width="84" Height="25" Click="DTongBiBtn_Click"/>
+                    <Button x:Name="DHuanBiBtn" Content="计算环比" HorizontalAlignment="Right" Margin="0,256,340,0" VerticalAlignment="Top" Width="84" Height="25" Click="DHuanBiBtn_Click"/>
+                    <Label Content="选择奶牛ID" HorizontalAlignment="Right" Margin="0,226,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <ComboBox x:Name="DCow1IDCbB" HorizontalAlignment="Right" Margin="0,226,180,0" VerticalAlignment="Top" Width="75" Height="25" VerticalContentAlignment="Center" ItemsSource="{Binding Items, ElementName=Sigle_CowIdCbB}" SelectionChanged="DCow1IDCbB_SelectionChanged"/>
+                    <ComboBox x:Name="DCow2IDCbB" HorizontalAlignment="Right" Margin="0,227,90,0" VerticalAlignment="Top" Width="75" Height="25" VerticalContentAlignment="Center" ItemsSource="{Binding Items, ElementName=Sigle_CowIdCbB}" SelectionChanged="DCow2IDCbB_SelectionChanged"/>
+                    <Label Content="开始日期" HorizontalAlignment="Right" Margin="0,257,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label Content="结束日期" HorizontalAlignment="Right" Margin="0,286,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <DatePicker x:Name="DStartDateDP1" HorizontalAlignment="Right" Margin="0,256,180,0" VerticalAlignment="Top" Width="75" Height="25" SelectedDateChanged="DStartDateDP1_SelectedDateChanged"/>
+                    <DatePicker x:Name="DEndDateDP1" HorizontalAlignment="Right" Margin="0,286,180,0" VerticalAlignment="Top" Width="75" Height="25" SelectedDateChanged="DEndDateDP1_SelectedDateChanged"/>
+                    <DatePicker x:Name="DStartDateDP2" HorizontalAlignment="Right" Margin="0,257,90,0" VerticalAlignment="Top" Width="75" Height="25" SelectedDateChanged="DStartDateDP2_SelectedDateChanged"/>
+                    <DatePicker x:Name="DEndDateDP2" HorizontalAlignment="Right" Margin="0,286,90,0" VerticalAlignment="Top" Height="25" Width="75" SelectedDateChanged="DEndDateDP2_SelectedDateChanged"/>
+                    <Label Content="阈值" HorizontalAlignment="Right" Margin="0,316,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <ComboBox x:Name="DThresholdCbB" HorizontalAlignment="Right" Margin="0,316,90,0" VerticalAlignment="Top" Width="164" Height="25" VerticalContentAlignment="Center">
+                        <ComboBoxItem Content="0"/>
+                        <ComboBoxItem Content="1"/>
+                        <ComboBoxItem Content="2"/>
+                    </ComboBox>
 
                 </Grid>
             </TabItem>

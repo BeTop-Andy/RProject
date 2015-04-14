@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Threading;
 using System.IO;
 using MySql.Data.MySqlClient;
+using System.Collections.ObjectModel;
 
 
 
@@ -31,6 +32,7 @@ namespace RProject
         private int rowPerPage = 3600;
         private int length = 0;
 
+        private ObservableCollection<CowListItem> Cows = new ObservableCollection<CowListItem>();
 
         public MainWindow()
         {
@@ -45,15 +47,14 @@ namespace RProject
 
             re = REngine.CreateInstance("R");
             re.Initialize();
-
+            Double_CowIdLV.ItemsSource = Cows;
             MySqlCommand comm = new MySqlCommand("SELECT DISTINCT cowId from `data`;", myConn);
             using (MySqlDataReader dr = comm.ExecuteReader()) {
                 while (dr.Read()) {
                     Sigle_CowIdCbB.Items.Add(dr.GetString(0));
                     string CowId = dr.GetString(0);
                     CowListItem cli = new CowListItem(Convert.ToInt32(CowId));
-                    Double_CowIdLV.Items.Add(cli);
-                    
+                    Cows.Add(cli);
                 }
             }
         }
@@ -256,6 +257,18 @@ namespace RProject
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
         
 
 
@@ -281,11 +294,15 @@ namespace RProject
 
     class CowListItem
     {
+        public bool IsChecked { get; set; }
         public int CowId { get; set; }
+        public int Threshold { get; set; }
 
         public CowListItem(int id)
         {
+            IsChecked = false;
             CowId = id;
+            Threshold = -1;
         }
     }
 }
