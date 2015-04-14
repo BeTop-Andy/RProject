@@ -42,6 +42,18 @@ namespace RProject
             REngine re = REngine.GetInstanceFromID("R");
             return Math.Round(re.Evaluate("mean(c(" + varName1 + "," + varName2 + "))").AsNumeric()[0], 2);
         }
+        public static double Avg(List<string> varNames)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            string commStr = "c(";
+            foreach (string i in varNames) {
+                commStr += i + ",";
+            }
+            commStr = commStr.Substring(0, commStr.Length - 1);
+            commStr += ")";
+            return Avg(commStr);
+        }
+
 
         /// <summary>
         /// 用R求方差
@@ -57,6 +69,17 @@ namespace RProject
         {
             REngine re = REngine.GetInstanceFromID("R");
             return Math.Round(re.Evaluate("var(c(" + varName1 + "," + varName2 + "))").AsNumeric()[0], 2);
+        }
+        public static double Var(List<string> varNames)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            string commStr = "c(";
+            foreach (string i in varNames) {
+                commStr += i + ",";
+            }
+            commStr = commStr.Substring(0, commStr.Length - 1);
+            commStr += ")";
+            return Var(commStr);
         }
 
         /// <summary>
@@ -74,6 +97,17 @@ namespace RProject
             REngine re = REngine.GetInstanceFromID("R");
             return re.Evaluate("max(c(" + varName1 + "," + varName2 + "))").AsInteger()[0];
         }
+        public static int Max(List<string> varNames)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            string commStr = "c(";
+            foreach (string i in varNames) {
+                commStr += i + ",";
+            }
+            commStr = commStr.Substring(0, commStr.Length - 1);
+            commStr += ")";
+            return Max(commStr);
+        }
 
         /// <summary>
         /// 用R求最小值
@@ -89,6 +123,17 @@ namespace RProject
         {
             REngine re = REngine.GetInstanceFromID("R");
             return re.Evaluate("min(c(" + varName1 + "," + varName2 + "))").AsInteger()[0];
+        }
+        public static int Min(List<string> varNames)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            string commStr = "c(";
+            foreach (string i in varNames) {
+                commStr += i + ",";
+            }
+            commStr = commStr.Substring(0, commStr.Length - 1);
+            commStr += ")";
+            return Min(commStr);
         }
 
         /// <summary>
@@ -106,6 +151,17 @@ namespace RProject
             REngine re = REngine.GetInstanceFromID("R");
             return re.Evaluate("median(c(" + varName1 + "," + varName2 + "))").AsInteger()[0];
         }
+        public static int Median(List<string> varNames)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            string commStr = "c(";
+            foreach (string i in varNames) {
+                commStr += i + ",";
+            }
+            commStr = commStr.Substring(0, commStr.Length - 1);
+            commStr += ")";
+            return Median(commStr);
+        }
 
         /// <summary>
         /// 用R求众数
@@ -121,6 +177,17 @@ namespace RProject
         {
             REngine re = REngine.GetInstanceFromID("R");
             return Convert.ToInt32(re.Evaluate("names(which.max(table(c(" + varName1 + "," + varName2 + "))))").AsCharacter()[0]);
+        }
+        public static int Mode(List<string> varNames)
+        {
+            REngine re = REngine.GetInstanceFromID("R");
+            string commStr = "c(";
+            foreach (string i in varNames) {
+                commStr += i + ",";
+            }
+            commStr = commStr.Substring(0, commStr.Length - 1);
+            commStr += ")";
+            return Mode(commStr);
         }
 
         public static void LoadingSmoothFunToR()

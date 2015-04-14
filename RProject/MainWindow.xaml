@@ -158,14 +158,14 @@
 
                 </Grid>
             </TabItem>
-            <TabItem Header="设置" Height="30" VerticalAlignment="Top" Margin="0,145,0,-145">
+            <TabItem Header="设置" Height="30" VerticalAlignment="Top" Margin="0,145,0,-145" Visibility="Hidden">
                 <Grid>
                     <Label Content="每一页的行数（默认3600）" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="160" Margin="10,10,0,0" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="RowPerPageTB" HorizontalAlignment="Left" Height="25" Margin="175,10,0,0" TextWrapping="Wrap" Text="3600" VerticalAlignment="Top" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                     <Button x:Name="ApplyBtn" Content="应用" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="30" Width="75" Click="ApplyBtn_Click"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="单头奶牛" Height="30" VerticalAlignment="Top" Margin="0,69,0,-69">
+            <TabItem Header="单头奶牛" Height="30" VerticalAlignment="Top" Margin="0,69,0,-69" Visibility="Hidden">
                 <Grid >
                     <Label Content="选择奶牛ID" Margin="10,10,621,0" VerticalAlignment="Top"/>
                     <TextBox x:Name="ResultTextBox" Margin="10,60,101,357" TextWrapping="Wrap" Text="等待选择文件" VerticalContentAlignment="Center" IsEnabled="False"/>
@@ -244,6 +244,34 @@
                         <ComboBoxItem Content="1"/>
                         <ComboBoxItem Content="2"/>
                     </ComboBox>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="一群奶牛" Height="30" VerticalAlignment="Top" Margin="0,-41,0,0">
+                <Grid >
+                    <ListView x:Name="Group_CowIdLV" Margin="10,10,429,10" ItemsSource="{Binding Items, ElementName=Double_CowIdLV}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="选择？" Width="50"  CellTemplate="{StaticResource IsSelectedDT}"/>
+                                <GridViewColumn Header="奶牛ID" Width="50" CellTemplate="{StaticResource CowIdDT}"/>
+                                <GridViewColumn Header="选择时间段" Width="75" CellTemplate="{StaticResource SelectTimeDT}"/>
+                                <GridViewColumn Header="阈值" Width="50" CellTemplate="{StaticResource ThresholdDT}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <Button x:Name="GSBtn" Content="统计→" HorizontalAlignment="Right" Margin="0,10,340,0" VerticalAlignment="Top" Width="84" Height="25" Click="GSBtn_Click"/>
+                    <Label x:Name="GSD2L" Content="未知" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="方　差：" HorizontalAlignment="Right" Margin="0,10,90,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="GAVGL" Content="未知" HorizontalAlignment="Right" Margin="0,10,180,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="平均值：" HorizontalAlignment="Right" Margin="0,10,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="GMinL" Content="未知" HorizontalAlignment="Right" Margin="0,40,10,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="最小值：" HorizontalAlignment="Right" Margin="0,40,90,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="GMaxL" Content="未知" HorizontalAlignment="Right" Margin="0,40,180,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="最大值：" HorizontalAlignment="Right" Margin="0,40,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="GModeL" Content="未知" HorizontalAlignment="Right" Margin="0,70,10,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="众　数：" HorizontalAlignment="Right" Margin="0,70,90,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
+                    <Label x:Name="GMedianL" Content="未知" HorizontalAlignment="Right" Margin="0,70,180,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="中位数：" HorizontalAlignment="Right" Margin="0,70,260,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Right"/>
 
                 </Grid>
             </TabItem>
