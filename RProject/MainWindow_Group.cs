@@ -25,10 +25,15 @@ namespace RProject
                     varNames.Add("GCow" + i.CowId);
                 }
             }
-            foreach (string i in varNames) {
-                ReadDataToR_D1(Convert.ToInt32( i.Substring(4)), i);
+            if (varNames.Count != 0) {
+                foreach (string i in varNames) {
+                    ReadDataToR_D1(Convert.ToInt32(i.Substring(4)), i);
+                }
+
+                StatisticsByR_G(varNames);
+            } else {
+                MessageBox.Show("请选择至少一头奶牛");
             }
-            StatisticsByR_G(varNames);
         }
 
         private void StatisticsByR_G(List<string> varNames)
