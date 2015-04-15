@@ -49,12 +49,12 @@
                         <ComboBoxItem Content="data"/>
                         <ComboBoxItem Content="temp"/>
                     </ComboBox>
-                    <Label Content="（CSV）选择页数" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,10,294,0" FlowDirection="LeftToRight" HorizontalAlignment="Right" Width="116" Height="30" VerticalAlignment="Top"/>
-                    <Button x:Name="LastPageBtn" Content="上一页" Margin="0,10,228,0" Click="LastPageBtn_Click" FlowDirection="LeftToRight" Height="30" VerticalAlignment="Top" HorizontalAlignment="Right" Width="61" />
-                    <Label Content="现在第" VerticalContentAlignment="Center" Margin="0,10,175,0" Padding="0,5" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="48" Height="30" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="SelectPageCbB" Margin="0,10,104,0" SelectionChanged="SelectPageCbB_SelectionChanged" VerticalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Width="71" Height="30" VerticalAlignment="Top"/>
-                    <Label Content="页" VerticalContentAlignment="Center" Margin="0,10,76,0" Padding="0,5" RenderTransformOrigin="35.8,2.033" HorizontalAlignment="Right" Width="28" Height="30" VerticalAlignment="Top"/>
-                    <Button x:Name="NextPageBtn" Content="下一页" Margin="0,10,10,0" Click="NextPageBtn_Click" FlowDirection="LeftToRight" RenderTransformOrigin="10.3,1.633" HorizontalAlignment="Right" Width="61" Height="30" VerticalAlignment="Top"/>
+                    <Label Content="（CSV）选择页数" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,10,294,0" FlowDirection="LeftToRight" HorizontalAlignment="Right" Width="116" Height="30" VerticalAlignment="Top" Visibility="Hidden"/>
+                    <Button x:Name="LastPageBtn" Content="上一页" Margin="0,10,228,0" Click="LastPageBtn_Click" FlowDirection="LeftToRight" Height="30" VerticalAlignment="Top" HorizontalAlignment="Right" Width="61" Visibility="Hidden" />
+                    <Label Content="现在第" VerticalContentAlignment="Center" Margin="0,10,175,0" Padding="0,5" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="48" Height="30" VerticalAlignment="Top" Visibility="Hidden"/>
+                    <ComboBox x:Name="SelectPageCbB" Margin="0,10,104,0" SelectionChanged="SelectPageCbB_SelectionChanged" VerticalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Width="71" Height="30" VerticalAlignment="Top" Visibility="Hidden"/>
+                    <Label Content="页" VerticalContentAlignment="Center" Margin="0,10,76,0" Padding="0,5" RenderTransformOrigin="35.8,2.033" HorizontalAlignment="Right" Width="28" Height="30" VerticalAlignment="Top" Visibility="Hidden"/>
+                    <Button x:Name="NextPageBtn" Content="下一页" Margin="0,10,10,0" Click="NextPageBtn_Click" FlowDirection="LeftToRight" RenderTransformOrigin="10.3,1.633" HorizontalAlignment="Right" Width="61" Height="30" VerticalAlignment="Top" Visibility="Hidden"/>
                 </Grid>
             </TabItem>
             <TabItem Header="单头奶牛" Margin="0,9,0,-20" RenderTransformOrigin="0.5,0.5">
